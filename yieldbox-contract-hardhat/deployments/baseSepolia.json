@@ -1,0 +1,14 @@
+{
+  "network": "baseSepolia",
+  "deployer": "0x1b2fc03ad5405347a60b407929633ffc544f1db6",
+  "deployments": {
+    "ERC6551Registry": "0x828b0597072ab5d6ff8372612e21d35e48414cec",
+    "ERC6551Account": "0xfde24d7b91fe89819313339ff2fe9351b404379f",
+    "OpenCrateStrategyRegistry": "0xaa91fe1a5687fda370807ed60549bf910247f86a",
+    "MockYieldProtocol": "0x45e42bf22ae541ba329c51b016abb4695de138e0",
+    "MockYieldAdapter": "0x9bb0825cef84ffd9226d228cb0e3e9bae3eb774a",
+    "OpenCrateNFT": "0x9c5027d920beb6de065a5679b673763384afd707",
+    "OpenCrateFactory": "0x6c9297e60c969e7b4906a745ced21c73d1d71431"
+  },
+  "timestamp": "2025-10-24T20:50:05.393Z"
+}
