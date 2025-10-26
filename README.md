@@ -1,39 +1,72 @@
-# YieldBox Monorepo
+# YieldBox Monorepo 🚀
 
-Composable infrastructure for launching and managing token-bound DeFi NFTs. This repository hosts both the Next.js front end and the Hardhat smart contract suite that power YieldBox end to end.
+YieldBox is a composable launchpad for token-bound DeFi NFTs. It blends a wallet-aware Next.js application with a Hardhat-powered Solidity stack so teams can design strategies, mint token-bound accounts, and orchestrate on-chain cash flows from a single codebase.
 
-## Highlights
+## ✨ Product Snapshot
 
-- Full-stack monorepo: Next.js 15 + React 19 UI and a Hardhat 3 (beta) Solidity workspace.
-- Wallet-native UX with RainbowKit v2, wagmi, viem, and Radix UI components tailored for Web3 flows.
-- Token-bound ERC-6551 architecture (_OpenCrateNFT_ + _ERC6551Account_) with factory orchestration and strategy registry integrations.
-- Base Sepolia deployment pipeline with viaIR-optimized Solidity builds and automated verification scripts.
+- Curate DeFi yield "crates" with configurable fees, lockups, and supported payment tokens.
+- Mint ERC-6551 powered NFTs that each own their own smart account and deployed strategy payload.
+- Give operators an admin cockpit for crafting templates while letting users mint and manage positions with a few clicks.
+- Target Base Sepolia out of the box, with scripts and artifacts ready for live network deployment and verification.
 
-## Repository Layout
+## 🏗️ Architecture Overview
 
 ```
-yieldbox-fe/                 # Next.js frontend (Turbopack build pipeline)
-├─ src/                      # App router, features, Wagmi config, UI components
-├─ public/                   # Static assets
-└─ ...                       # Husky hooks, Tailwind config, etc.
-
-yieldbox-contract-hardhat/   # Hardhat 3 + Viem smart contract workspace
-├─ contracts/                # Solidity sources (ERC6551Account, OpenCrate, mocks)
-├─ scripts/                  # Deploy, verify, and utility scripts
-├─ test/                     # Node:test suites (per-suite fresh deployments)
-└─ deployments/              # Generated deployment artifacts
+                +-----------------------------+
+                |  HyperIndex / GraphQL API   |
+                |  (template + token metadata)|
+                +--------------+--------------+
+                               ^
+                               |
+Frontend (Next.js 15, React 19)|    wagmi + viem RPC calls
+RainbowKit wallet UX           |    (wallet actions, reads)
+                               |
+                               v
++--------------+------------------------------+
+|          Base Sepolia Network               |
+|  OpenCrateFactory ⚙  -> mints OpenCrateNFTs |
+|  ERC6551Account 🧠  -> token-bound accounts  |
+|  Strategy Registry 📚 -> reusable strategies |
++---------------------------------------------+
 ```
 
-## Prerequisites
+Core concepts:
+- **Templates:** Admin-defined blueprints (price, allocations, fees, disclosures, supported tokens).
+- **Token-bound NFTs:** Each minted NFT spawns an ERC-6551 smart account that can custody DeFi positions.
+- **Indexer:** Frontend pulls template, token, and crate data from a HyperIndex instance for fast reads.
+- **Wallet UX:** Users connect via WalletConnect/RainbowKit, preview strategies, and sign mint transactions in real time.
 
-- Node.js 20+ (Next.js 15 and Hardhat 3 expect modern Node features).
-- npm (repo scripts assume npm; adapt to pnpm/yarn if preferred).
-- Git configured with Husky hooks enabled (`npm install` runs `husky install` automatically).
-- For smart contract work: funded Base Sepolia account and API keys for Etherscan/BaseScan.
+## 🔁 End-to-End Flow
 
-## Getting Started
+1. 🛠 Admin connects their wallet, fills out the template form, and calls `OpenCrateFactory.createTemplate`.
+2. 🧠 Strategy and supported token metadata sync to the indexer for fast consumption in the UI.
+3. 👀 Users browse curated strategies, compare allocations, and pick their preferred lockup multiplier.
+4. 📨 Mint action signs a transaction through wagmi; the factory mints an `OpenCrateNFT`, wires fees, and registers an ERC-6551 account.
+5. 📬 Frontend waits for confirmation, refreshes the indexer data, and surfaces the fresh token-bound account details.
 
-Clone the repository, install dependencies for each workspace, then run the front end and tests as needed.
+## 📦 Repository Layout
+
+```
+yieldbox-fe/
+  src/                Next.js app router, features, wagmi config, UI components
+  public/             Static assets
+  ...                 Tailwind, Husky, and build tooling
+
+yieldbox-contract-hardhat/
+  contracts/          Solidity sources (OpenCrate suite, ERC-6551, mocks)
+  scripts/            Deploy, verify, and operational scripts
+  test/               Node:test suites exercising deployments and flows
+  deployments/        Generated deployment outputs (ignored until scripts run)
+```
+
+## 🛠️ Prerequisites
+
+- Node.js 20 or newer (Next.js 15 and Hardhat 3 rely on modern Node features).
+- npm (all scripts assume npm; swap to pnpm or yarn only if you reconfigure).
+- Git with Husky hooks enabled (`npm install` triggers `husky install`).
+- For on-chain work: a funded Base Sepolia account plus Etherscan and BaseScan API keys.
+
+## 🚀 Getting Started
 
 ```bash
 git clone <repo-url>
@@ -42,79 +75,79 @@ cd YieldBox
 # Frontend setup
 cd yieldbox-fe
 npm install
-cp .env.example .env.local   # ensure WalletConnect + backend URLs are configured
+cp .env.example .env.local   # populate WalletConnect project ID and indexer URL
 npm run dev                  # launches Next.js with Turbopack
 
 # Contracts setup
 cd ../yieldbox-contract-hardhat
 npm install
-cp .env.example .env         # fill in Base Sepolia + API keys
-npx hardhat test             # run Node:test suites via Viem
+cp .env.example .env         # fill Base Sepolia RPC/private key + API keys
+npx hardhat test             # runs Node:test suites via viem
 ```
 
-> Turbopack powers both `npm run dev` and `npm run build`; expect different logs than the default Next.js compiler.
+Note: Turbopack powers both `npm run dev` and `npm run build`, so logs differ from classic Next.js builds.
 
-## Frontend (`yieldbox-fe`)
+## 🖥️ Frontend (`yieldbox-fe`)
 
-- **Stack:** Next.js App Router, React 19, Tailwind CSS v4 (via experimental PostCSS), Radix UI primitives, RainbowKit v2, wagmi, viem, TanStack Query.
-- **Key features:**
-  - Wallet-aware interface with chain-aware transports defined in `src/wagmi.ts`.
-  - Token-bound NFT discovery, minting, and management flows (`src/features/defi-nfts`).
-  - Admin tooling for template creation and on-chain transaction orchestration.
-  - Dynamic visual components (`hero-section`, `case-opening-modal`, etc.) backed by Tailwind utility layers.
-- **Important commands**
-  - `npm run dev` — Launch Turbopack dev server.
-  - `npm run build` — Production build (fails without required env vars like the WalletConnect Project ID).
-  - `npm run type-check` — TypeScript must pass before commits (enforced by hooks).
-  - `npm run lint` / `npm run format` — Linting & formatting (pre-push hooks run lint + build).
-- **Environment variables**
-  - `NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID` — Required for RainbowKit; missing value triggers runtime warnings and build failures.
-  - `NEXT_PUBLIC_INDEXER_URL` — Backend/indexer endpoint used for NFT data hydration.
+- **Stack:** Next.js App Router, React 19, Tailwind CSS v4, Radix UI, RainbowKit v2, wagmi, viem, TanStack Query.
+- **Features:**
+  - Wallet-aware routing and themeable UI built on Radix primitives.
+  - DeFi NFT catalogue with detail sheets, mint flows, and token support introspection.
+  - Admin workspace for creating templates and feeding data into the indexer.
+  - Toast-driven transaction UX via wagmi hooks and on-chain receipts.
+- **Core commands:**
+  - `npm run dev` - Turbopack development server.
+  - `npm run build` - Production bundle (requires WalletConnect env).
+  - `npm run type-check` - Required by git hooks before commits.
+  - `npm run lint` / `npm run format` - ESLint and Prettier workflows.
+- **Key environment variables:**
+  - `NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID` - Needed for RainbowKit to initialize.
+  - `NEXT_PUBLIC_INDEXER_URL` - GraphQL endpoint that hydrates template/token data.
 
-## Smart Contracts (`yieldbox-contract-hardhat`)
+## 🔐 Smart Contracts (`yieldbox-contract-hardhat`)
 
-- **Stack:** Hardhat 3 (ESM), Solidity 0.8.28 with viaIR optimization, Viem-based toolbox, forge-std test utilities, TokenBound SDK.
-- **Core contracts:**
-  - `OpenCrateFactory.sol` — Deploys token-bound wallets and orchestrates templates.
-  - `OpenCrateNFT.sol` — ERC-6551 compatible NFT that anchors DeFi strategies.
-  - `ERC6551Account.sol` & registry bindings — Account implementation for token-bound operations.
-  - `MockPriceOracle.sol` — Test oracle for strategy simulations.
+- **Stack:** Hardhat 3 (ESM), Solidity 0.8.28 with viaIR, viem toolbox, forge-std, TokenBound SDK.
+- **Contract suite:**
+  - `OpenCrateFactory.sol` - Template registry, payment handling, NFT minting, lockup logic.
+  - `OpenCrateNFT.sol` - ERC-6551 friendly NFT that links to strategy payloads.
+  - `ERC6551Account.sol` - Token-bound smart account implementation.
+  - `MockPriceOracle.sol` - Deterministic price feeds for tests.
+  - `strategies/OpenCrateStrategyRegistry.sol` - Manages reusable strategy metadata.
 - **Scripts:**
-  - `scripts/deploy.ts` — Local or custom network deployments.
-  - `scripts/deploy-sepolia.ts` — Deploys to Base Sepolia (uses env-configured RPC + key).
-  - `scripts/verify-sepolia.ts` — Runs verification against Etherscan/BaseScan APIs.
-  - `scripts/test-purchase.ts` — Utility script for exercising purchase flow post-deploy.
+  - `scripts/deploy.ts` - Deploy to local/custom networks.
+  - `scripts/deploy-sepolia.ts` - One-command Base Sepolia deployment.
+  - `scripts/verify-sepolia.ts` - Verify contracts with Etherscan/BaseScan.
+  - `scripts/test-purchase.ts` - Exercise crate purchase flow against deployed instances.
 - **Testing:**
-  - `npx hardhat test` — Runs all Node:test suites (no Mocha/Chai). Each suite deploys fresh contracts, sets up mock tokens and adapters.
-  - `npx hardhat test solidity` / `npx hardhat test nodejs` — Filtered test runs.
-- **Environment variables:** define RPC URLs, private keys, and API keys in `.env`.
-  - `BASE_SEPOLIA_RPC_URL`, `BASE_SEPOLIA_PRIVATE_KEY` (required for anything on Base Sepolia).
-  - `ETHERSCAN_API_KEY`, `BASESCAN_API_KEY` for verification.
-  - Optional Ethereum Sepolia variables for cross-network references.
+  - `npx hardhat test` - Runs Node:test suites (no Mocha/Chai) with fresh deployments per describe block.
+  - `npx hardhat test solidity` / `npx hardhat test nodejs` - Target Solidity or TypeScript tests.
+- **Required env vars (`.env`):**
+  - `BASE_SEPOLIA_RPC_URL` and `BASE_SEPOLIA_PRIVATE_KEY` - RPC endpoint plus funded key.
+  - `ETHERSCAN_API_KEY` and `BASESCAN_API_KEY` - Contract verification credentials.
+  - Optional `SEPOLIA_*` variables if you cross-compile for Ethereum Sepolia.
 
-## Development Workflow Tips
+## 🧰 Development Workflow Tips
 
-- Husky hooks enforce `npm run type-check`, `npm run lint`, and a successful build before pushes—keep both workspaces green.
-- When tweaking Web3 configuration (`src/wagmi.ts`), ensure transports are set for every chain to avoid runtime errors.
-- Contract scripts use `configVariable` from Hardhat for environment safety; missing variables throw early.
-- Frontend fetchers expect the indexer URL to be reachable; update mocks or `.env.local` when developing offline.
-- WalletConnect integration requires a valid project ID on both dev and build; requests fail silently otherwise.
+- Husky gates pushes with `npm run type-check`, `npm run lint`, and `npm run build`; keep both workspaces clean.
+- Web3 config in `src/wagmi.ts` must define transports for every supported chain to avoid runtime errors.
+- Hardhat uses `configVariable`, so missing env vars fail fast - populate `.env` before running scripts.
+- Indexer responses power most UI views; when working offline, mock the GraphQL responses or adjust hooks.
+- WalletConnect integration requires a valid project ID in both dev and build environments.
 
-## Troubleshooting
+## 🩺 Troubleshooting
 
-- **Frontend build fails immediately:** double-check `.env.local` for `NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID`.
-- **Hardhat commands throw configVariable errors:** ensure the `.env` file exists and all required keys are populated.
-- **Gas estimation quirks on Base Sepolia:** viaIR is enabled; consider adjusting optimizer runs or enabling tracing if debugging.
-- **Node:test not discovering suites:** confirm files reside under `yieldbox-contract-hardhat/test` and use the built-in `node:test` API.
+- **Frontend build fails immediately:** Confirm `NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID` in `.env.local`.
+- **`configVariable` throws:** Double-check `.env` inside `yieldbox-contract-hardhat`.
+- **Unexpected gas estimates:** viaIR can change gas patterns; tune optimizer runs or enable tracing.
+- **Node:test finds no files:** Ensure tests live in `yieldbox-contract-hardhat/test` and use the Node test API.
 
-## Contributing
+## 🤝 Contributing
 
-1. Fork and branch (`feat/your-feature`).
-2. Keep changes isolated per workspace; run `npm run type-check && npm run lint` in the front end and `npx hardhat test` for contracts.
-3. Update documentation if public APIs, contract ABIs, or environment requirements change.
-4. Submit a pull request with context around smart contract migrations or front-end state changes.
+1. Fork and branch (for example `feat/your-feature`).
+2. Keep workspace changes isolated; run `npm run type-check && npm run lint` in the front end and `npx hardhat test` for contracts.
+3. Update docs whenever ABIs, scripts, or env requirements change.
+4. Open a pull request with context on migrations, UI flows, or contract interfaces.
 
-## License
+## 📄 License
 
-Add license details here (MIT, Apache 2.0, etc.) once the project’s licensing is finalized.
-
+Add license details here (MIT, Apache 2.0, etc.) once the project licensing is finalized.

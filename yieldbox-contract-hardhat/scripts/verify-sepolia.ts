@@ -4,10 +4,11 @@ import { execSync } from "child_process";
 import { fileURLToPath } from "url";
 import { parseUnits, zeroAddress } from "viem";
 
-// __dirname for ESM
+// ESM __dirname shim
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
+// Decimals (must match deploy.ts)
 const USDC_DECIMALS = 6;
 const IDRX_DECIMALS = 2;
 
@@ -46,6 +47,21 @@ function quote(arg: any): string {
   return `"${normalizeArg(arg)}"`;
 }
 
+// Fully Qualified Names to disambiguate identical bytecode (Blockscout/Etherscan)
+const fqMap: Record<string, string> = {
+  MockUSDC: "contracts/mock/MockUSDC.sol:MockUSDC",
+  MockIDRX: "contracts/mock/MockIDRX.sol:MockIDRX",
+  MockPriceOracle: "contracts/MockPriceOracle.sol:MockPriceOracle",
+  ERC6551Registry: "contracts/ERC6551Registry.sol:ERC6551Registry",
+  ERC6551Account: "contracts/ERC6551Account.sol:ERC6551Account",
+  OpenCrateStrategyRegistry:
+    "contracts/strategies/OpenCrateStrategyRegistry.sol:OpenCrateStrategyRegistry",
+  MockYieldProtocol: "contracts/mock/MockYieldProtocol.sol:MockYieldProtocol",
+  MockYieldAdapter: "contracts/adapters/MockYieldAdapter.sol:MockYieldAdapter",
+  OpenCrateNFT: "contracts/OpenCrateNFT.sol:OpenCrateNFT",
+  OpenCrateFactory: "contracts/OpenCrateFactory.sol:OpenCrateFactory",
+};
+
 async function main() {
   console.log("🔍 Verifying contracts on Base Sepolia...");
 
@@ -61,8 +77,9 @@ async function main() {
     throw new Error("Deployer address missing in deployment file.");
   }
 
+  // Verification order (dependencies first)
   const order = [
-    // Mocks and utilities first
+    // Mocks and infra
     "MockUSDC",
     "MockIDRX",
     "MockPriceOracle",
@@ -85,7 +102,6 @@ async function main() {
 
       case "MockIDRX":
         // constructor(address owner, uint256 initialSupply, uint8 decimals)
-        // 165,000,000 IDRX with 2 decimals = 1,650,000.00 IDRX nominal amount for demo
         return [deployer, parseUnits("165000000", IDRX_DECIMALS), IDRX_DECIMALS];
 
       case "MockPriceOracle":
@@ -114,7 +130,13 @@ async function main() {
 
       case "OpenCrateNFT":
         // constructor(string name, string symbol, string baseURI, address owner, address factory)
-        return ["OpenCrate", "CRATE", "https://metadata.opencrate.io/", deployer, zeroAddress];
+        return [
+          "OpenCrate",
+          "CRATE",
+          "https://metadata.opencrate.io/",
+          deployer,
+          zeroAddress,
+        ];
 
       case "OpenCrateFactory":
         // constructor(
@@ -139,6 +161,8 @@ async function main() {
     }
   }
 
+  const force = process.env.VERIFY_FORCE === "1";
+
   for (const name of order) {
     const address = deployments[name];
     if (!address) {
@@ -146,35 +170,71 @@ async function main() {
       continue;
     }
 
+    const fq = fqMap[name];
+    if (!fq) {
+      console.log(
+        `⚠️ No fully-qualified name mapping for ${name}, attempting generic verification`
+      );
+    }
+
     const args = constructorArgsFor(name);
     const argsString = args.map((a) => quote(a)).join(" ");
+    const forceFlag = force ? " --force" : "";
+    const contractFlag = fq ? ` --contract ${fq}` : "";
+
     const command =
-      `npx hardhat verify --network baseSepolia ${address}` +
+      `npx hardhat verify --network baseSepolia${contractFlag}${forceFlag} ${address}` +
       (args.length ? ` ${argsString}` : "");
 
     console.log(`\n➡️  Verifying ${name} at ${address}`);
     console.log(`   $ ${command}`);
 
-    try {
-      execSync(command, { stdio: "inherit" });
-      console.log(`✅ ${name} verified successfully`);
-    } catch (error: any) {
-      const msg = (error?.message || "").toString();
-      const std = (error?.stdout || "").toString() + (error?.stderr || "").toString();
-      if (msg.includes("Already Verified") || std.includes("Already Verified")) {
-        console.log(`✅ ${name} already verified`);
-      } else {
+    let attempts = 0;
+    const maxAttempts = 3;
+
+    for (; attempts < maxAttempts; attempts++) {
+      try {
+        execSync(command, { stdio: "inherit" });
+        console.log(`✅ ${name} verified successfully`);
+        break;
+      } catch (error: any) {
+        const combined =
+          (error?.message || "") +
+          (error?.stdout || "") +
+          (error?.stderr || "");
+
+        if (combined.includes("Already Verified")) {
+          console.log(`✅ ${name} already verified`);
+          break;
+        }
+
+        // Retry on transient explorer errors
+        const transient =
+          combined.includes("ECONNRESET") ||
+          combined.includes("429") ||
+          combined.includes("ETIMEDOUT");
+        if (attempts < maxAttempts - 1 && transient) {
+          console.log("⚠️ Transient explorer error. Retrying in 3s...");
+          await sleep(3000);
+          continue;
+        }
+
         console.log(`❌ Failed to verify ${name}`);
-        console.log("   You may retry or verify manually at: https://sepolia.basescan.org/verifyContract");
+        console.log(
+          "   You may retry or verify manually at: https://base-sepolia.blockscout.com/ or https://sepolia.basescan.org/"
+        );
+        break;
       }
     }
 
-    // Avoid rate limiting
-    await sleep(3000);
+    // Avoid rate limiting between verifications
+    await sleep(2000);
   }
 
   console.log("\n🎉 Verification complete!");
-  console.log("Tip: Ensure BASESCAN_API_KEY (and ETHERSCAN_API_KEY if needed) are set in .env");
+  console.log(
+    "Tip: Ensure BASESCAN_API_KEY (and ETHERSCAN_API_KEY if needed) are set in .env. Use VERIFY_FORCE=1 to pass --force."
+  );
 }
 
 main()
