@@ -1,0 +1,69 @@
+# yaml-language-server: $schema=./node_modules/envio/evm.schema.json
+name: envio-indexer
+networks:
+- id: 84532
+  start_block: 0
+  contracts:
+  - name: OpenCrateNFT
+    address:
+    - 0x9C5027d920bEb6De065A5679b673763384AFd707
+    handler: src/EventHandlers.ts
+    events:
+    - event: Approval(address indexed owner, address indexed approved, uint256 indexed tokenId)
+    - event: ApprovalForAll(address indexed owner, address indexed operator, bool approved)
+    - event: BaseURIUpdated(string baseURI)
+    - event: BoostStatusUpdated(uint256 indexed tokenId, bool active, uint16 boostMultiplierBps)
+    - event: BoostUpdated(uint256 indexed tokenId, uint16 boostMultiplierBps)
+    - event: CrateMinted(uint256 indexed tokenId, address indexed to, uint8 riskLevel, uint256 strategyId, address account, uint256 priceUsd, uint16 boostMultiplierBps, uint64 lockedUntil)
+    - event: FactoryUpdated(address indexed newFactory)
+    - event: FeeDisclosureUpdated(uint256 indexed tokenId, string feeDisclosure)
+    - event: LifecycleUpdated(uint256 indexed tokenId, uint64 lastRebalanceAt, uint64 nextHarvestAt, uint256 accruedYieldUsd)
+    - event: LockExtended(uint256 indexed tokenId, uint64 lockedUntil)
+    - event: OwnershipTransferred(address indexed previousOwner, address indexed newOwner)
+    - event: PositionMetricsUpdated(uint256 indexed tokenId, uint256 indexed positionIndex, (string,string,string,string,string,uint16,uint256,int256,int256,int256,int256,uint8,uint64,uint64,uint64,uint256) details)
+    - event: PositionsUpdated(uint256 indexed tokenId, uint256 positionCount, address indexed updater)
+    - event: PriceUpdated(uint256 indexed tokenId, uint256 priceUsd)
+    - event: RevenueShareUpdated(uint256 indexed tokenId, uint16 revenueShareBps, uint16 platformFeeBps, uint16 performanceFeeBps)
+    - event: RiskDisclosureUpdated(uint256 indexed tokenId, string riskDisclosure)
+    - event: Transfer(address indexed from, address indexed to, uint256 indexed tokenId)
+  - name: MockYieldProtocol
+    address:
+    - 0x45E42Bf22ae541BA329c51B016Abb4695de138e0
+    handler: src/EventHandlers.ts
+    events:
+    - event: AdapterUpdated(address indexed adapter)
+    - event: Deposited(address indexed account, address indexed receiver, uint256 amount)
+    - event: OwnershipTransferred(address indexed previousOwner, address indexed newOwner)
+    - event: RewardRateUpdated(uint256 rewardRate)
+    - event: Withdrawn(address indexed account, address indexed receiver, uint256 amount)
+    - event: YieldAccrued(address indexed account, uint256 amount)
+    - event: YieldClaimed(address indexed account, address indexed receiver, uint256 amount)
+  - name: MockYieldAdapter
+    address:
+    - 0x9bB0825cEf84FFd9226D228cB0E3E9BAe3Eb774a
+    handler: src/EventHandlers.ts
+    events:
+    - event: Deposited(address indexed account, address indexed receiver, uint256 amount, bytes data)
+    - event: OwnershipTransferred(address indexed previousOwner, address indexed newOwner)
+    - event: Withdrawn(address indexed account, address indexed receiver, uint256 amount, bytes data)
+    - event: YieldClaimed(address indexed account, address indexed receiver, uint256 amount, bytes data)
+  - name: OpenCrateStrategyRegistry
+    address:
+    - 0x4a32026CB40820e2608510676086B7b26683133f
+    handler: src/EventHandlers.ts
+    events:
+    - event: OwnershipTransferred(address indexed previousOwner, address indexed newOwner)
+    - event: StrategyRegistered(uint256 indexed strategyId, address indexed adapter, uint8 riskLevel)
+    - event: StrategyStatusUpdated(uint256 indexed strategyId, bool active)
+    - event: StrategyUpdated(uint256 indexed strategyId, address indexed adapter, uint8 riskLevel, bytes adapterData)
+  - name: OpenCrateFactory
+    address:
+    - 0x6C9297e60c969e7b4906a745ced21c73d1D71431
+    handler: src/EventHandlers.ts
+    events:
+    - event: AccountImplementationUpdated(address indexed newImplementation)
+    - event: CrateCreated(uint256 indexed tokenId, address indexed owner, address indexed account, uint256 strategyId, uint8 riskLevel, address adapter, uint256 priceUsd, uint16 boostMultiplierBps, uint64 lockedUntil, address creator, uint16 revenueShareBps, uint16 platformFeeBps, uint16 performanceFeeBps, uint256 positionCount)
+    - event: OwnershipTransferred(address indexed previousOwner, address indexed newOwner)
+    - event: StrategyRegistryUpdated(address indexed newRegistry)
+unordered_multichain_mode: true
+preload_handlers: true

@@ -1,0 +1,265 @@
+type MockYieldAdapter_Deposited {
+  id: ID!
+  account: String!
+  receiver: String!
+  amount: BigInt!
+  data: String!
+}
+
+type MockYieldAdapter_OwnershipTransferred {
+  id: ID!
+  previousOwner: String!
+  newOwner: String!
+}
+
+type MockYieldAdapter_Withdrawn {
+  id: ID!
+  account: String!
+  receiver: String!
+  amount: BigInt!
+  data: String!
+}
+
+type MockYieldAdapter_YieldClaimed {
+  id: ID!
+  account: String!
+  receiver: String!
+  amount: BigInt!
+  data: String!
+}
+
+type MockYieldProtocol_AdapterUpdated {
+  id: ID!
+  adapter: String!
+}
+
+type MockYieldProtocol_Deposited {
+  id: ID!
+  account: String!
+  receiver: String!
+  amount: BigInt!
+}
+
+type MockYieldProtocol_OwnershipTransferred {
+  id: ID!
+  previousOwner: String!
+  newOwner: String!
+}
+
+type MockYieldProtocol_RewardRateUpdated {
+  id: ID!
+  rewardRate: BigInt!
+}
+
+type MockYieldProtocol_Withdrawn {
+  id: ID!
+  account: String!
+  receiver: String!
+  amount: BigInt!
+}
+
+type MockYieldProtocol_YieldAccrued {
+  id: ID!
+  account: String!
+  amount: BigInt!
+}
+
+type MockYieldProtocol_YieldClaimed {
+  id: ID!
+  account: String!
+  receiver: String!
+  amount: BigInt!
+}
+
+type OpenCrateFactory_AccountImplementationUpdated {
+  id: ID!
+  newImplementation: String!
+}
+
+type OpenCrateFactory_CrateCreated {
+  id: ID!
+  tokenId: BigInt!
+  owner: String!
+  account: String!
+  strategyId: BigInt!
+  riskLevel: BigInt!
+  adapter: String!
+  priceUsd: BigInt!
+  boostMultiplierBps: BigInt!
+  lockedUntil: BigInt!
+  creator: String!
+  revenueShareBps: BigInt!
+  platformFeeBps: BigInt!
+  performanceFeeBps: BigInt!
+  positionCount: BigInt!
+}
+
+type OpenCrateFactory_OwnershipTransferred {
+  id: ID!
+  previousOwner: String!
+  newOwner: String!
+}
+
+type OpenCrateFactory_StrategyRegistryUpdated {
+  id: ID!
+  newRegistry: String!
+}
+
+type OpenCrateNFT_Approval {
+  id: ID!
+  owner: String!
+  approved: String!
+  tokenId: BigInt!
+}
+
+type OpenCrateNFT_ApprovalForAll {
+  id: ID!
+  owner: String!
+  operator: String!
+  approved: Boolean!
+}
+
+type OpenCrateNFT_BaseURIUpdated {
+  id: ID!
+  baseURI: String!
+}
+
+type OpenCrateNFT_BoostStatusUpdated {
+  id: ID!
+  tokenId: BigInt!
+  active: Boolean!
+  boostMultiplierBps: BigInt!
+}
+
+type OpenCrateNFT_BoostUpdated {
+  id: ID!
+  tokenId: BigInt!
+  boostMultiplierBps: BigInt!
+}
+
+type OpenCrateNFT_CrateMinted {
+  id: ID!
+  tokenId: BigInt!
+  to: String!
+  riskLevel: BigInt!
+  strategyId: BigInt!
+  account: String!
+  priceUsd: BigInt!
+  boostMultiplierBps: BigInt!
+  lockedUntil: BigInt!
+}
+
+type OpenCrateNFT_FactoryUpdated {
+  id: ID!
+  newFactory: String!
+}
+
+type OpenCrateNFT_FeeDisclosureUpdated {
+  id: ID!
+  tokenId: BigInt!
+  feeDisclosure: String!
+}
+
+type OpenCrateNFT_LifecycleUpdated {
+  id: ID!
+  tokenId: BigInt!
+  lastRebalanceAt: BigInt!
+  nextHarvestAt: BigInt!
+  accruedYieldUsd: BigInt!
+}
+
+type OpenCrateNFT_LockExtended {
+  id: ID!
+  tokenId: BigInt!
+  lockedUntil: BigInt!
+}
+
+type OpenCrateNFT_OwnershipTransferred {
+  id: ID!
+  previousOwner: String!
+  newOwner: String!
+}
+
+type OpenCrateNFT_PositionMetricsUpdated {
+  id: ID!
+  tokenId: BigInt!
+  positionIndex: BigInt!
+  details_0: String!
+  details_1: String!
+  details_2: String!
+  details_3: String!
+  details_4: String!
+  details_5: BigInt!
+  details_6: BigInt!
+  details_7: BigInt!
+  details_8: BigInt!
+  details_9: BigInt!
+  details_10: BigInt!
+  details_11: BigInt!
+  details_12: BigInt!
+  details_13: BigInt!
+  details_14: BigInt!
+  details_15: BigInt!
+}
+
+type OpenCrateNFT_PositionsUpdated {
+  id: ID!
+  tokenId: BigInt!
+  positionCount: BigInt!
+  updater: String!
+}
+
+type OpenCrateNFT_PriceUpdated {
+  id: ID!
+  tokenId: BigInt!
+  priceUsd: BigInt!
+}
+
+type OpenCrateNFT_RevenueShareUpdated {
+  id: ID!
+  tokenId: BigInt!
+  revenueShareBps: BigInt!
+  platformFeeBps: BigInt!
+  performanceFeeBps: BigInt!
+}
+
+type OpenCrateNFT_RiskDisclosureUpdated {
+  id: ID!
+  tokenId: BigInt!
+  riskDisclosure: String!
+}
+
+type OpenCrateNFT_Transfer {
+  id: ID!
+  from: String!
+  to: String!
+  tokenId: BigInt!
+}
+
+type OpenCrateStrategyRegistry_OwnershipTransferred {
+  id: ID!
+  previousOwner: String!
+  newOwner: String!
+}
+
+type OpenCrateStrategyRegistry_StrategyRegistered {
+  id: ID!
+  strategyId: BigInt!
+  adapter: String!
+  riskLevel: BigInt!
+}
+
+type OpenCrateStrategyRegistry_StrategyStatusUpdated {
+  id: ID!
+  strategyId: BigInt!
+  active: Boolean!
+}
+
+type OpenCrateStrategyRegistry_StrategyUpdated {
+  id: ID!
+  strategyId: BigInt!
+  adapter: String!
+  riskLevel: BigInt!
+  adapterData: String!
+}
+

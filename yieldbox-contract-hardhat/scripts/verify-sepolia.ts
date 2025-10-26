@@ -47,9 +47,9 @@ async function main() {
           deployments.OpenCrateStrategyRegistry,
           deployer
         ];
-      } else if (name === "OpenCrateNFTEnhanced") {
+      } else if (name === "OpenCrateNFT") {
         constructorArgs = []; // No constructor args
-      } else if (name === "OpenCrateFactoryEnhanced") {
+      } else if (name === "OpenCrateFactory") {
         constructorArgs = []; // No constructor args
       }
 

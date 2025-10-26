@@ -13,5 +13,5 @@
     "types": ["hardhat", "node"],
     "baseUrl": "."
   },
-  "include": ["**/*.ts", "types/**/*.d.ts", "hardhat.config.ts", "scripts/**/*.ts", "test/**/*.ts"]
+  "include": ["**/*.ts", "hardhat.config.ts", "scripts/**/*.ts", "test/**/*.ts"]
 }

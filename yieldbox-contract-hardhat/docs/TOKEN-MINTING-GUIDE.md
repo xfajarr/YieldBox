@@ -123,7 +123,7 @@ console.log(`Crate minted with token ID: ${tokenId}`);
 
 ## Contract Integration
 
-### OpenCrateNFTEnhanced
+### OpenCrateNFT
 
 The enhanced NFT contract includes token support functionality:
 
@@ -141,7 +141,7 @@ The enhanced NFT contract includes token support functionality:
 - `TokenRemoved(address indexed token)`
 - `TokenPriceUpdated(address indexed token, uint256 oldPriceUsd, uint256 newPriceUsd)`
 
-### OpenCrateFactoryEnhanced
+### OpenCrateFactory
 
 The enhanced factory handles template-based crate creation and token payments:
 

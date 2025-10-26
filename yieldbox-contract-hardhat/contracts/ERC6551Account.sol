@@ -11,10 +11,12 @@ import "./interfaces/IERC6551Account.sol";
 contract ERC6551Account is IERC165, IERC1271, IERC6551Account {
     uint256 private _nonce;
 
+    error CallerNotTokenOwner();
+
     receive() external payable {}
 
     function executeCall(address to, uint256 value, bytes calldata data) external payable returns (bytes memory result) {
-        require(msg.sender == owner(), "Not Token Owner");
+        if (msg.sender != owner()) revert CallerNotTokenOwner();
 
         bool success;
         (success, result) = to.call{value: value}(data);

@@ -5,9 +5,8 @@ import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import "@openzeppelin/contracts/token/common/ERC2981.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/Strings.sol";
-import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
-contract OpenCrateNFTEnhanced is ERC721, ERC2981, Ownable {
+contract OpenCrateNFTLegacy is ERC721, ERC2981, Ownable {
     using Strings for uint256;
 
     uint256 public constant USD_DECIMALS = 2;
@@ -17,12 +16,6 @@ contract OpenCrateNFTEnhanced is ERC721, ERC2981, Ownable {
     uint16 public constant MAX_BOOST_BPS = 20_000; // 2.0x
     uint16 public constant MAX_BPS = 10_000;
     uint64 public constant MAX_LOCK_DURATION = 365 days;
-
-    struct TokenInfo {
-        bool enabled;
-        uint256 priceUsd; // Price in USD (2 decimals)
-        uint8 decimals; // Token decimals
-    }
 
     struct CrateInfo {
         uint8 riskLevel;
@@ -44,8 +37,6 @@ contract OpenCrateNFTEnhanced is ERC721, ERC2981, Ownable {
         bool boostActive;
         uint64 lastBoostAt;
         uint64 lastLockAt;
-        address paymentToken; // Token used for payment
-        uint256 paymentAmount; // Amount paid in token
     }
 
     struct PositionDetails {
@@ -86,27 +77,6 @@ contract OpenCrateNFTEnhanced is ERC721, ERC2981, Ownable {
         uint256 accruedYieldUsd;
     }
 
-    struct MintParams {
-        address to;
-        uint8 riskLevel;
-        uint256 strategyId;
-        address account;
-        uint256 priceUsd;
-        uint16 boostMultiplierBps;
-        uint64 lockDuration;
-        address creator;
-        uint16 revenueShareBps;
-        uint16 platformFeeBps;
-        uint16 performanceFeeBps;
-        string riskDisclosure;
-        string feeDisclosure;
-        uint64 lastRebalanceAt;
-        uint64 nextHarvestAt;
-        uint256 accruedYieldUsd;
-        bool boostActive;
-        PositionPayload[] positions;
-    }
-
     error Unauthorized();
     error InvalidAccount();
     error InvalidRecipient();
@@ -119,9 +89,6 @@ contract OpenCrateNFTEnhanced is ERC721, ERC2981, Ownable {
     error TokenLocked(uint64 lockedUntil);
     error InvalidBps();
     error InvalidPositionTotalAllocation();
-    error TokenNotSupported(address token);
-    error InsufficientTokenPayment();
-    error InvalidTokenAmount();
 
     event FactoryUpdated(address indexed newFactory);
     event BaseURIUpdated(string baseURI);
@@ -133,9 +100,7 @@ contract OpenCrateNFTEnhanced is ERC721, ERC2981, Ownable {
         address account,
         uint256 priceUsd,
         uint16 boostMultiplierBps,
-        uint64 lockedUntil,
-        address indexed paymentToken,
-        uint256 paymentAmount
+        uint64 lockedUntil
     );
     event PriceUpdated(uint256 indexed tokenId, uint256 priceUsd);
     event BoostUpdated(uint256 indexed tokenId, uint16 boostMultiplierBps);
@@ -147,9 +112,6 @@ contract OpenCrateNFTEnhanced is ERC721, ERC2981, Ownable {
     event RiskDisclosureUpdated(uint256 indexed tokenId, string riskDisclosure);
     event FeeDisclosureUpdated(uint256 indexed tokenId, string feeDisclosure);
     event BoostStatusUpdated(uint256 indexed tokenId, bool active, uint16 boostMultiplierBps);
-    event TokenAdded(address indexed token, uint256 priceUsd, uint8 decimals);
-    event TokenRemoved(address indexed token);
-    event TokenPriceUpdated(address indexed token, uint256 priceUsd);
 
     address public factory;
     string private _baseTokenURI;
@@ -158,8 +120,6 @@ contract OpenCrateNFTEnhanced is ERC721, ERC2981, Ownable {
 
     mapping(uint256 => CrateInfo) private _crateInfo;
     mapping(uint256 => PositionDetails[]) private _positions;
-    mapping(address => TokenInfo) public supportedTokens;
-    address[] public whitelistedTokens;
 
     constructor(
         string memory name_,
@@ -194,51 +154,33 @@ contract OpenCrateNFTEnhanced is ERC721, ERC2981, Ownable {
         _deleteDefaultRoyalty();
     }
 
-    function addSupportedToken(
-        address token,
-        uint256 priceUsd,
-        uint8 decimals
-    ) external onlyOwner {
-        require(token != address(0), "Invalid token address");
-        require(priceUsd > 0, "Invalid price");
-        supportedTokens[token] = TokenInfo({
-            enabled: true,
-            priceUsd: priceUsd,
-            decimals: decimals
-        });
-        whitelistedTokens.push(token);
-        emit TokenAdded(token, priceUsd, decimals);
-    }
-
-    function removeSupportedToken(address token) external onlyOwner {
-        supportedTokens[token].enabled = false;
-        emit TokenRemoved(token);
-    }
-
-    function updateTokenPrice(address token, uint256 newPriceUsd) external onlyOwner {
-        require(supportedTokens[token].enabled, "Token not supported");
-        supportedTokens[token].priceUsd = newPriceUsd;
-        emit TokenPriceUpdated(token, newPriceUsd);
-    }
-
-    function getSupportedToken(address token) external view returns (TokenInfo memory) {
-        return supportedTokens[token];
-    }
-
-    function getWhitelistedTokens() external view returns (address[] memory) {
-        return whitelistedTokens;
-    }
-
     function mintCrate(
-        MintParams calldata params
+        address to,
+        uint8 riskLevel,
+        uint256 strategyId,
+        address account,
+        uint256 priceUsd,
+        uint16 boostMultiplierBps,
+        uint64 lockDuration,
+        address creator,
+        uint16 revenueShareBps,
+        uint16 platformFeeBps,
+        uint16 performanceFeeBps,
+        string calldata riskDisclosure,
+        string calldata feeDisclosure,
+        uint64 lastRebalanceAt,
+        uint64 nextHarvestAt,
+        uint256 accruedYieldUsd,
+        bool boostActive,
+        PositionPayload[] calldata positions
     ) external returns (uint256 tokenId) {
         if (msg.sender != factory) revert Unauthorized();
-        if (params.account == address(0)) revert InvalidAccount();
-        if (params.to == address(0)) revert InvalidRecipient();
-        _validatePrice(params.priceUsd);
-        _validateBoost(params.boostMultiplierBps);
-        if (params.lockDuration > MAX_LOCK_DURATION) revert InvalidLockDuration();
-        _validateFeeSet(params.revenueShareBps, params.platformFeeBps, params.performanceFeeBps);
+        if (account == address(0)) revert InvalidAccount();
+        if (to == address(0)) revert InvalidRecipient();
+        _validatePrice(priceUsd);
+        _validateBoost(boostMultiplierBps);
+        if (lockDuration > MAX_LOCK_DURATION) revert InvalidLockDuration();
+        _validateFeeSet(revenueShareBps, platformFeeBps, performanceFeeBps);
 
         tokenId = _nextTokenId;
         unchecked {
@@ -246,129 +188,37 @@ contract OpenCrateNFTEnhanced is ERC721, ERC2981, Ownable {
             ++_totalMinted;
         }
 
-        uint64 lockedUntil = params.lockDuration == 0 ? 0 : uint64(block.timestamp + params.lockDuration);
-        address crateCreator = params.creator == address(0) ? params.to : params.creator;
+        uint64 lockedUntil = lockDuration == 0 ? 0 : uint64(block.timestamp + lockDuration);
+        address crateCreator = creator == address(0) ? to : creator;
         uint64 lastLockAt = lockedUntil == 0 ? 0 : uint64(block.timestamp);
-        uint64 lastBoostAt = params.boostActive ? uint64(block.timestamp) : 0;
+        uint64 lastBoostAt = boostActive ? uint64(block.timestamp) : 0;
 
-        _safeMint(params.to, tokenId);
+        _safeMint(to, tokenId);
         _crateInfo[tokenId] = CrateInfo({
-            riskLevel: params.riskLevel,
-            strategyId: params.strategyId,
-            account: params.account,
+            riskLevel: riskLevel,
+            strategyId: strategyId,
+            account: account,
             mintedAt: uint64(block.timestamp),
             lockedUntil: lockedUntil,
-            boostMultiplierBps: params.boostMultiplierBps,
-            priceUsd: params.priceUsd,
+            boostMultiplierBps: boostMultiplierBps,
+            priceUsd: priceUsd,
             creator: crateCreator,
-            revenueShareBps: params.revenueShareBps,
-            platformFeeBps: params.platformFeeBps,
-            performanceFeeBps: params.performanceFeeBps,
-            riskDisclosure: params.riskDisclosure,
-            feeDisclosure: params.feeDisclosure,
-            lastRebalanceAt: params.lastRebalanceAt,
-            nextHarvestAt: params.nextHarvestAt,
-            accruedYieldUsd: params.accruedYieldUsd,
-            boostActive: params.boostActive,
+            revenueShareBps: revenueShareBps,
+            platformFeeBps: platformFeeBps,
+            performanceFeeBps: performanceFeeBps,
+            riskDisclosure: riskDisclosure,
+            feeDisclosure: feeDisclosure,
+            lastRebalanceAt: lastRebalanceAt,
+            nextHarvestAt: nextHarvestAt,
+            accruedYieldUsd: accruedYieldUsd,
+            boostActive: boostActive,
             lastBoostAt: lastBoostAt,
-            lastLockAt: lastLockAt,
-            paymentToken: address(0), // Will be set in buyCrate
-            paymentAmount: 0 // Will be set in buyCrate
+            lastLockAt: lastLockAt
         });
 
-        _setPositions(tokenId, params.positions);
+        _setPositions(tokenId, positions);
 
-        emit CrateMinted(
-            tokenId,
-            params.to,
-            params.riskLevel,
-            params.strategyId,
-            params.account,
-            params.priceUsd,
-            params.boostMultiplierBps,
-            lockedUntil,
-            address(0), // No payment token for direct mint
-            0 // No payment amount for direct mint
-        );
-    }
-
-    function buyCrate(
-        address paymentToken,
-        uint256 paymentAmount,
-        MintParams calldata params
-    ) external returns (uint256 tokenId) {
-        if (msg.sender != factory) revert Unauthorized();
-        if (params.account == address(0)) revert InvalidAccount();
-        if (params.to == address(0)) revert InvalidRecipient();
-        
-        TokenInfo memory tokenInfo = supportedTokens[paymentToken];
-        if (!tokenInfo.enabled) revert TokenNotSupported(paymentToken);
-        if (paymentAmount == 0) revert InvalidTokenAmount();
-
-        // Calculate USD value of payment
-        uint256 paymentUsdValue = (paymentAmount * tokenInfo.priceUsd) / (10 ** tokenInfo.decimals);
-        
-        // Validate that payment covers the price
-        if (paymentUsdValue < params.priceUsd) revert InsufficientTokenPayment();
-
-        _validatePrice(params.priceUsd);
-        _validateBoost(params.boostMultiplierBps);
-        if (params.lockDuration > MAX_LOCK_DURATION) revert InvalidLockDuration();
-        _validateFeeSet(params.revenueShareBps, params.platformFeeBps, params.performanceFeeBps);
-
-        // Transfer payment tokens from user to contract
-        IERC20(paymentToken).transferFrom(msg.sender, address(this), paymentAmount);
-
-        tokenId = _nextTokenId;
-        unchecked {
-            ++_nextTokenId;
-            ++_totalMinted;
-        }
-
-        uint64 lockedUntil = params.lockDuration == 0 ? 0 : uint64(block.timestamp + params.lockDuration);
-        address crateCreator = params.creator == address(0) ? params.to : params.creator;
-        uint64 lastLockAt = lockedUntil == 0 ? 0 : uint64(block.timestamp);
-        uint64 lastBoostAt = params.boostActive ? uint64(block.timestamp) : 0;
-
-        _safeMint(params.to, tokenId);
-        _crateInfo[tokenId] = CrateInfo({
-            riskLevel: params.riskLevel,
-            strategyId: params.strategyId,
-            account: params.account,
-            mintedAt: uint64(block.timestamp),
-            lockedUntil: lockedUntil,
-            boostMultiplierBps: params.boostMultiplierBps,
-            priceUsd: params.priceUsd,
-            creator: crateCreator,
-            revenueShareBps: params.revenueShareBps,
-            platformFeeBps: params.platformFeeBps,
-            performanceFeeBps: params.performanceFeeBps,
-            riskDisclosure: params.riskDisclosure,
-            feeDisclosure: params.feeDisclosure,
-            lastRebalanceAt: params.lastRebalanceAt,
-            nextHarvestAt: params.nextHarvestAt,
-            accruedYieldUsd: params.accruedYieldUsd,
-            boostActive: params.boostActive,
-            lastBoostAt: lastBoostAt,
-            lastLockAt: lastLockAt,
-            paymentToken: paymentToken,
-            paymentAmount: paymentAmount
-        });
-
-        _setPositions(tokenId, params.positions);
-
-        emit CrateMinted(
-            tokenId,
-            params.to,
-            params.riskLevel,
-            params.strategyId,
-            params.account,
-            params.priceUsd,
-            params.boostMultiplierBps,
-            lockedUntil,
-            paymentToken,
-            paymentAmount
-        );
+        emit CrateMinted(tokenId, to, riskLevel, strategyId, account, priceUsd, boostMultiplierBps, lockedUntil);
     }
 
     function crateInfo(uint256 tokenId) external view returns (CrateInfo memory) {
@@ -557,3 +407,5 @@ contract OpenCrateNFTEnhanced is ERC721, ERC2981, Ownable {
         emit PositionsUpdated(tokenId, positions.length, msg.sender);
     }
 }
+
+

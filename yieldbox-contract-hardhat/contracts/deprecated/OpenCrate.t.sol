@@ -3,22 +3,22 @@ pragma solidity ^0.8.28;
 
 import "forge-std/Test.sol";
 
-import "./OpenCrateNFT.sol";
-import "./OpenCrateFactory.sol";
-import "./strategies/OpenCrateStrategyRegistry.sol";
-import "./adapters/MockYieldAdapter.sol";
-import "./mock/MockYieldProtocol.sol";
-import "./interfaces/IDeFiAdapter.sol";
-import "./ERC6551Registry.sol";
-import "./ERC6551Account.sol";
+import { OpenCrateNFTLegacy } from "./OpenCrateNFTLegacy.sol";
+import { OpenCrateFactoryLegacy } from "./OpenCrateFactoryLegacy.sol";
+import "../strategies/OpenCrateStrategyRegistry.sol";
+import "../adapters/MockYieldAdapter.sol";
+import "../mock/MockYieldProtocol.sol";
+import "../interfaces/IDeFiAdapter.sol";
+import "../ERC6551Registry.sol";
+import "../ERC6551Account.sol";
 
 contract OpenCrateTest is Test {
     address internal owner = makeAddr("owner");
     address internal user = makeAddr("user");
     address internal other = makeAddr("other");
 
-    OpenCrateNFT internal crateNFT;
-    OpenCrateFactory internal factory;
+    OpenCrateNFTLegacy internal crateNFT;
+    OpenCrateFactoryLegacy internal factory;
     OpenCrateStrategyRegistry internal strategyRegistry;
     MockYieldProtocol internal yieldProtocol;
     MockYieldAdapter internal yieldAdapter;
@@ -51,9 +51,9 @@ contract OpenCrateTest is Test {
         yieldAdapter = new MockYieldAdapter(yieldProtocol, owner);
         yieldProtocol.setAdapter(address(yieldAdapter));
 
-        crateNFT = new OpenCrateNFT("OpenCrate", "CRATE", "https://metadata/", owner, address(0));
+        crateNFT = new OpenCrateNFTLegacy("OpenCrate", "CRATE", "https://metadata/", owner, address(0));
 
-        factory = new OpenCrateFactory(
+        factory = new OpenCrateFactoryLegacy(
             crateNFT,
             accountRegistry,
             address(accountImplementation),
@@ -67,11 +67,11 @@ contract OpenCrateTest is Test {
         vm.stopPrank();
     }
 
-    function _emptyPositions() internal pure returns (OpenCrateNFT.PositionPayload[] memory positions) {
-        positions = new OpenCrateNFT.PositionPayload[](0);
+    function _emptyPositions() internal pure returns (OpenCrateNFTLegacy.PositionPayload[] memory positions) {
+        positions = new OpenCrateNFTLegacy.PositionPayload[](0);
     }
 
-    function _buildMintParams(address to, uint256 salt) internal pure returns (OpenCrateFactory.MintParams memory params) {
+    function _buildMintParams(address to, uint256 salt) internal pure returns (OpenCrateFactoryLegacy.MintParams memory params) {
         params.to = to;
         params.riskLevel = RISK_HIGH;
         params.strategyId = 1;
@@ -97,7 +97,7 @@ contract OpenCrateTest is Test {
         internal
         returns (uint256 tokenId, address account)
     {
-        OpenCrateFactory.MintParams memory params = _buildMintParams(recipient, salt);
+        OpenCrateFactoryLegacy.MintParams memory params = _buildMintParams(recipient, salt);
         params.adapterData = adapterData;
 
         vm.prank(recipient);
@@ -107,8 +107,8 @@ contract OpenCrateTest is Test {
     function _mintCustomCrate(
         address recipient,
         uint256 salt,
-        OpenCrateFactory.MintParams memory params,
-        OpenCrateNFT.PositionPayload[] memory positions
+        OpenCrateFactoryLegacy.MintParams memory params,
+        OpenCrateNFTLegacy.PositionPayload[] memory positions
     ) internal returns (uint256 tokenId, address account) {
         vm.prank(recipient);
         (tokenId, account) = factory.mintCrate(params, positions);
@@ -160,7 +160,7 @@ contract OpenCrateTest is Test {
         strategyRegistry.registerStrategy(address(yieldAdapter), bytes(""), RISK_HIGH, true);
     }
 
-    function _assertDefaultCrateInfo(OpenCrateNFT.CrateInfo memory info, address expectedOwner) internal view {
+    function _assertDefaultCrateInfo(OpenCrateNFTLegacy.CrateInfo memory info, address expectedOwner) internal view {
         assertEq(info.riskLevel, RISK_HIGH);
         assertEq(info.strategyId, 1);
         assertEq(info.creator, expectedOwner);
@@ -178,12 +178,12 @@ contract OpenCrateTest is Test {
         assertEq(info.lastBoostAt, 0);
     }
 
-    function testOpenCrateNFTFactoryMinting() public {
+    function testOpenCrateNFTLegacyFactoryMinting() public {
         (uint256 tokenId, address account) = _mintDefaultCrate(user, 777, abi.encode(user));
         assertEq(tokenId, 1);
         assertEq(crateNFT.ownerOf(tokenId), user);
 
-        OpenCrateNFT.CrateInfo memory info = crateNFT.crateInfo(tokenId);
+        OpenCrateNFTLegacy.CrateInfo memory info = crateNFT.crateInfo(tokenId);
         assertEq(info.account, account);
         assertGt(info.mintedAt, 0);
         _assertDefaultCrateInfo(info, user);
@@ -195,7 +195,7 @@ contract OpenCrateTest is Test {
         assertEq(adapter, address(yieldAdapter));
         assertEq(adapterData, abi.encode(user));
 
-        OpenCrateFactory.CrateDeployment memory deployment = factory.crateDeployment(tokenId);
+        OpenCrateFactoryLegacy.CrateDeployment memory deployment = factory.crateDeployment(tokenId);
         assertEq(deployment.strategyId, 1);
         assertEq(deployment.riskLevel, RISK_HIGH);
         assertEq(deployment.salt, 777);
@@ -203,8 +203,8 @@ contract OpenCrateTest is Test {
         assertEq(deployment.positionCount, 0);
     }
 
-    function testOpenCrateNFTOnlyFactoryCanMint() public {
-        vm.expectRevert(OpenCrateNFT.Unauthorized.selector);
+    function testOpenCrateNFTLegacyOnlyFactoryCanMint() public {
+        vm.expectRevert(OpenCrateNFTLegacy.Unauthorized.selector);
         vm.prank(user);
         crateNFT.mintCrate(
             user,
@@ -229,8 +229,8 @@ contract OpenCrateTest is Test {
     }
 
     function testFactoryPredictAccountMatchesDeployment() public {
-        OpenCrateFactory.MintParams memory params = _buildMintParams(user, 42);
-        OpenCrateNFT.PositionPayload[] memory positions = _emptyPositions();
+        OpenCrateFactoryLegacy.MintParams memory params = _buildMintParams(user, 42);
+        OpenCrateNFTLegacy.PositionPayload[] memory positions = _emptyPositions();
 
         address predicted = factory.predictAccountForNext(params.salt);
         vm.prank(user);
@@ -247,60 +247,60 @@ contract OpenCrateTest is Test {
         vm.prank(owner);
         strategyRegistry.setStrategyStatus(1, false);
 
-        OpenCrateFactory.MintParams memory params = _buildMintParams(user, 1);
-        OpenCrateNFT.PositionPayload[] memory positions = _emptyPositions();
+        OpenCrateFactoryLegacy.MintParams memory params = _buildMintParams(user, 1);
+        OpenCrateNFTLegacy.PositionPayload[] memory positions = _emptyPositions();
 
-        vm.expectRevert(abi.encodeWithSelector(OpenCrateFactory.StrategyInactive.selector, params.strategyId));
+        vm.expectRevert(abi.encodeWithSelector(OpenCrateFactoryLegacy.StrategyInactive.selector, params.strategyId));
         vm.prank(user);
         factory.mintCrate(params, positions);
     }
 
     function testFactoryRejectsRiskMismatch() public {
-        OpenCrateFactory.MintParams memory params = _buildMintParams(user, 1);
+        OpenCrateFactoryLegacy.MintParams memory params = _buildMintParams(user, 1);
         params.riskLevel = 1;
-        OpenCrateNFT.PositionPayload[] memory positions = _emptyPositions();
+        OpenCrateNFTLegacy.PositionPayload[] memory positions = _emptyPositions();
 
-        vm.expectRevert(abi.encodeWithSelector(OpenCrateFactory.StrategyRiskMismatch.selector, RISK_HIGH, params.riskLevel));
+        vm.expectRevert(abi.encodeWithSelector(OpenCrateFactoryLegacy.StrategyRiskMismatch.selector, RISK_HIGH, params.riskLevel));
         vm.prank(user);
         factory.mintCrate(params, positions);
     }
 
     function testMintCrateRejectsPriceBelowMin() public {
-        OpenCrateFactory.MintParams memory params = _buildMintParams(user, 99);
+        OpenCrateFactoryLegacy.MintParams memory params = _buildMintParams(user, 99);
         params.priceUsd = crateNFT.MIN_PRICE_USD() - 1;
-        OpenCrateNFT.PositionPayload[] memory positions = _emptyPositions();
+        OpenCrateNFTLegacy.PositionPayload[] memory positions = _emptyPositions();
 
-        vm.expectRevert(OpenCrateNFT.InvalidPrice.selector);
+        vm.expectRevert(OpenCrateNFTLegacy.InvalidPrice.selector);
         vm.prank(user);
         factory.mintCrate(params, positions);
     }
 
     function testMintCrateRejectsPriceAboveMax() public {
-        OpenCrateFactory.MintParams memory params = _buildMintParams(user, 98);
+        OpenCrateFactoryLegacy.MintParams memory params = _buildMintParams(user, 98);
         params.priceUsd = crateNFT.MAX_PRICE_USD() + 1;
-        OpenCrateNFT.PositionPayload[] memory positions = _emptyPositions();
+        OpenCrateNFTLegacy.PositionPayload[] memory positions = _emptyPositions();
 
-        vm.expectRevert(OpenCrateNFT.InvalidPrice.selector);
+        vm.expectRevert(OpenCrateNFTLegacy.InvalidPrice.selector);
         vm.prank(user);
         factory.mintCrate(params, positions);
     }
 
     function testMintCrateRejectsBoostOutsideRange() public {
-        OpenCrateFactory.MintParams memory params = _buildMintParams(user, 97);
+        OpenCrateFactoryLegacy.MintParams memory params = _buildMintParams(user, 97);
         params.boostMultiplierBps = DEFAULT_BOOST_BPS - 1;
-        OpenCrateNFT.PositionPayload[] memory positions = _emptyPositions();
+        OpenCrateNFTLegacy.PositionPayload[] memory positions = _emptyPositions();
 
-        vm.expectRevert(OpenCrateNFT.InvalidBoost.selector);
+        vm.expectRevert(OpenCrateNFTLegacy.InvalidBoost.selector);
         vm.prank(user);
         factory.mintCrate(params, positions);
     }
 
     function testMintCrateRejectsLockDurationAboveMax() public {
-        OpenCrateFactory.MintParams memory params = _buildMintParams(user, 96);
+        OpenCrateFactoryLegacy.MintParams memory params = _buildMintParams(user, 96);
         params.lockDuration = uint64(uint256(crateNFT.MAX_LOCK_DURATION()) + 1);
-        OpenCrateNFT.PositionPayload[] memory positions = _emptyPositions();
+        OpenCrateNFTLegacy.PositionPayload[] memory positions = _emptyPositions();
 
-        vm.expectRevert(OpenCrateNFT.InvalidLockDuration.selector);
+        vm.expectRevert(OpenCrateNFTLegacy.InvalidLockDuration.selector);
         vm.prank(user);
         factory.mintCrate(params, positions);
     }
@@ -312,14 +312,14 @@ contract OpenCrateTest is Test {
         vm.prank(user);
         crateNFT.updatePrice(tokenId, newPrice);
 
-        OpenCrateNFT.CrateInfo memory info = crateNFT.crateInfo(tokenId);
+        OpenCrateNFTLegacy.CrateInfo memory info = crateNFT.crateInfo(tokenId);
         assertEq(info.priceUsd, newPrice);
     }
 
     function testUpdatePriceRequiresAuthorization() public {
         (uint256 tokenId,) = _mintDefaultCrate(user, 13, bytes(""));
 
-        vm.expectRevert(OpenCrateNFT.NotApprovedOrOwner.selector);
+        vm.expectRevert(OpenCrateNFTLegacy.NotApprovedOrOwner.selector);
         vm.prank(other);
         crateNFT.updatePrice(tokenId, DEFAULT_PRICE_USD + 50);
     }
@@ -331,7 +331,7 @@ contract OpenCrateTest is Test {
         vm.prank(user);
         crateNFT.setBoostMultiplier(tokenId, newBoost);
 
-        OpenCrateNFT.CrateInfo memory info = crateNFT.crateInfo(tokenId);
+        OpenCrateNFTLegacy.CrateInfo memory info = crateNFT.crateInfo(tokenId);
         assertEq(info.boostMultiplierBps, newBoost);
         assertTrue(info.boostActive);
         assertGt(info.lastBoostAt, 0);
@@ -343,7 +343,7 @@ contract OpenCrateTest is Test {
         vm.prank(user);
         crateNFT.setBoostStatus(tokenId, true, DEFAULT_BOOST_BPS + 1000);
 
-        OpenCrateNFT.CrateInfo memory info = crateNFT.crateInfo(tokenId);
+        OpenCrateNFTLegacy.CrateInfo memory info = crateNFT.crateInfo(tokenId);
         assertTrue(info.boostActive);
         assertEq(info.boostMultiplierBps, DEFAULT_BOOST_BPS + 1000);
         assertGt(info.lastBoostAt, 0);
@@ -356,7 +356,7 @@ contract OpenCrateTest is Test {
         vm.prank(user);
         crateNFT.extendLock(tokenId, duration);
 
-        OpenCrateNFT.CrateInfo memory info = crateNFT.crateInfo(tokenId);
+        OpenCrateNFTLegacy.CrateInfo memory info = crateNFT.crateInfo(tokenId);
         assertEq(info.lockedUntil, uint64(block.timestamp) + duration);
         assertGt(info.lastLockAt, 0);
     }
@@ -365,7 +365,7 @@ contract OpenCrateTest is Test {
         (uint256 tokenId,) = _mintDefaultCrate(user, 19, bytes(""));
         uint64 duration = uint64(uint256(crateNFT.MAX_LOCK_DURATION()) + 1);
 
-        vm.expectRevert(OpenCrateNFT.InvalidLockDuration.selector);
+        vm.expectRevert(OpenCrateNFTLegacy.InvalidLockDuration.selector);
         vm.prank(user);
         crateNFT.extendLock(tokenId, duration);
     }
@@ -374,8 +374,8 @@ contract OpenCrateTest is Test {
         (uint256 tokenId,) = _mintDefaultCrate(user, 22, bytes(""));
 
         uint256 currentTime = block.timestamp;
-        OpenCrateNFT.PositionPayload[] memory positions = new OpenCrateNFT.PositionPayload[](2);
-        positions[0] = OpenCrateNFT.PositionPayload({
+        OpenCrateNFTLegacy.PositionPayload[] memory positions = new OpenCrateNFTLegacy.PositionPayload[](2);
+        positions[0] = OpenCrateNFTLegacy.PositionPayload({
             protocol: "Aave",
             asset: "USDC",
             strategyType: "Lending",
@@ -393,7 +393,7 @@ contract OpenCrateTest is Test {
             nextHarvestAt: uint64(currentTime + 1 days),
             accruedYieldUsd: 1234
         });
-        positions[1] = OpenCrateNFT.PositionPayload({
+        positions[1] = OpenCrateNFTLegacy.PositionPayload({
             protocol: "Uniswap",
             asset: "ETH/USDC",
             strategyType: "LP",
@@ -415,7 +415,7 @@ contract OpenCrateTest is Test {
         vm.prank(user);
         crateNFT.updatePositions(tokenId, positions);
 
-        OpenCrateNFT.PositionDetails[] memory stored = crateNFT.getPositions(tokenId);
+        OpenCrateNFTLegacy.PositionDetails[] memory stored = crateNFT.getPositions(tokenId);
         assertEq(stored.length, 2);
         assertEq(stored[0].protocol, "Aave");
         assertEq(crateNFT.positionsCount(tokenId), 2);
@@ -426,8 +426,8 @@ contract OpenCrateTest is Test {
         (uint256 tokenId,) = _mintDefaultCrate(user, 23, bytes(""));
 
         uint256 currentTime = block.timestamp;
-        OpenCrateNFT.PositionPayload[] memory positions = new OpenCrateNFT.PositionPayload[](1);
-        positions[0] = OpenCrateNFT.PositionPayload({
+        OpenCrateNFTLegacy.PositionPayload[] memory positions = new OpenCrateNFTLegacy.PositionPayload[](1);
+        positions[0] = OpenCrateNFTLegacy.PositionPayload({
             protocol: "Balancer",
             asset: "ETH",
             strategyType: "Staking",
@@ -446,7 +446,7 @@ contract OpenCrateTest is Test {
             accruedYieldUsd: 100
         });
 
-        vm.expectRevert(OpenCrateNFT.InvalidBps.selector);
+        vm.expectRevert(OpenCrateNFTLegacy.InvalidBps.selector);
         vm.prank(user);
         crateNFT.updatePositions(tokenId, positions);
     }
@@ -455,7 +455,7 @@ contract OpenCrateTest is Test {
         (uint256 tokenId,) = _mintDefaultCrate(user, 24, bytes(""));
         vm.prank(user);
         crateNFT.updateLifecycle(tokenId, uint64(block.timestamp), uint64(block.timestamp + 1 days), 12345);
-        OpenCrateNFT.CrateInfo memory info = crateNFT.crateInfo(tokenId);
+        OpenCrateNFTLegacy.CrateInfo memory info = crateNFT.crateInfo(tokenId);
         assertEq(info.lastRebalanceAt, uint64(block.timestamp));
         assertEq(info.nextHarvestAt, uint64(block.timestamp + 1 days));
         assertEq(info.accruedYieldUsd, 12345);
@@ -465,7 +465,7 @@ contract OpenCrateTest is Test {
         (uint256 tokenId,) = _mintDefaultCrate(user, 25, bytes(""));
         vm.prank(user);
         crateNFT.updateRevenueShare(tokenId, 2_000, 500, 300);
-        OpenCrateNFT.CrateInfo memory info = crateNFT.crateInfo(tokenId);
+        OpenCrateNFTLegacy.CrateInfo memory info = crateNFT.crateInfo(tokenId);
         assertEq(info.revenueShareBps, 2_000);
         assertEq(info.platformFeeBps, 500);
         assertEq(info.performanceFeeBps, 300);
@@ -473,7 +473,7 @@ contract OpenCrateTest is Test {
 
     function testUpdateRevenueShareRejectsInvalid() public {
         (uint256 tokenId,) = _mintDefaultCrate(user, 26, bytes(""));
-        vm.expectRevert(OpenCrateNFT.InvalidBps.selector);
+        vm.expectRevert(OpenCrateNFTLegacy.InvalidBps.selector);
         vm.prank(user);
         crateNFT.updateRevenueShare(tokenId, 9_000, 2_000, 100);
     }
@@ -482,13 +482,13 @@ contract OpenCrateTest is Test {
         (uint256 tokenId,) = _mintDefaultCrate(user, 27, bytes(""));
         vm.prank(user);
         crateNFT.updateDisclosures(tokenId, "New risk", "New fee");
-        OpenCrateNFT.CrateInfo memory info = crateNFT.crateInfo(tokenId);
+        OpenCrateNFTLegacy.CrateInfo memory info = crateNFT.crateInfo(tokenId);
         assertEq(info.riskDisclosure, "New risk");
         assertEq(info.feeDisclosure, "New fee");
     }
 
     function testMintCrateStoresCustomPriceBoostLock() public {
-        OpenCrateFactory.MintParams memory params = _buildMintParams(user, 50);
+        OpenCrateFactoryLegacy.MintParams memory params = _buildMintParams(user, 50);
         params.priceUsd = 99900;
         params.boostMultiplierBps = 15_000;
         params.lockDuration = 10 days;
@@ -500,7 +500,7 @@ contract OpenCrateTest is Test {
         vm.prank(user);
         (uint256 tokenId, address account) = factory.mintCrate(params, _emptyPositions());
 
-        OpenCrateNFT.CrateInfo memory info = crateNFT.crateInfo(tokenId);
+        OpenCrateNFTLegacy.CrateInfo memory info = crateNFT.crateInfo(tokenId);
         assertEq(info.account, account);
         assertEq(info.priceUsd, 99900);
         assertEq(info.lockedUntil, uint64(block.timestamp + 10 days));
@@ -650,5 +650,4 @@ contract OpenCrateTest is Test {
         assertGt(afterIndex, beforeIndex);
     }
 }
-
 

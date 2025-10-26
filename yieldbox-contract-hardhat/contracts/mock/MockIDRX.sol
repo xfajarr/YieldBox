@@ -12,6 +12,7 @@ import "@openzeppelin/contracts/access/Ownable.sol";
  */
 contract MockIDRX is ERC20, Ownable {
     uint8 private _decimals;
+    error ArrayLengthMismatch();
     
     constructor(
         address initialOwner,
@@ -56,7 +57,7 @@ contract MockIDRX is ERC20, Ownable {
         address[] calldata recipients,
         uint256[] calldata amounts
     ) external onlyOwner {
-        require(recipients.length == amounts.length, "Arrays length mismatch");
+        if (recipients.length != amounts.length) revert ArrayLengthMismatch();
         
         for (uint256 i = 0; i < recipients.length; i++) {
             _mint(recipients[i], amounts[i]);
@@ -66,17 +67,16 @@ contract MockIDRX is ERC20, Ownable {
     /**
      * @dev Get token information
      */
-    function getTokenInfo() external view returns (
-        string memory name,
-        string memory symbol,
-        uint8 decimalsValue,
-        uint256 totalSupply
-    ) {
-        return (
-            name(),
-            symbol(),
-            decimals(),
-            totalSupply()
-        );
+    function getTokenInfo()
+        external
+        view
+        returns (
+            string memory tokenName,
+            string memory tokenSymbol,
+            uint8 decimalsValue,
+            uint256 totalSupplyAmount
+        )
+    {
+        return (name(), symbol(), decimals(), totalSupply());
     }
 }

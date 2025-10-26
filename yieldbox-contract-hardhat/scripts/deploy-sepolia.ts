@@ -77,25 +77,25 @@ async function main() {
     console.log("✅ Adapter set successfully");
 
     // 7. Deploy Enhanced OpenCrate NFT
-    console.log("📦 Deploying OpenCrateNFTEnhanced...");
-    const openCrateNFT = await viem.deployContract("OpenCrateNFTEnhanced");
-    deployments.OpenCrateNFTEnhanced = openCrateNFT.address;
-    console.log(`✅ OpenCrateNFTEnhanced deployed to: ${openCrateNFT.address}`);
+    console.log("📦 Deploying OpenCrateNFT...");
+    const openCrateNFT = await viem.deployContract("OpenCrateNFT");
+    deployments.OpenCrateNFT = openCrateNFT.address;
+    console.log(`✅ OpenCrateNFT deployed to: ${openCrateNFT.address}`);
 
     // 8. Deploy Enhanced OpenCrate Factory
-    console.log("📦 Deploying OpenCrateFactoryEnhanced...");
-    const openCrateFactory = await viem.deployContract("OpenCrateFactoryEnhanced");
-    deployments.OpenCrateFactoryEnhanced = openCrateFactory.address;
-    console.log(`✅ OpenCrateFactoryEnhanced deployed to: ${openCrateFactory.address}`);
+    console.log("📦 Deploying OpenCrateFactory...");
+    const openCrateFactory = await viem.deployContract("OpenCrateFactory");
+    deployments.OpenCrateFactory = openCrateFactory.address;
+    console.log(`✅ OpenCrateFactory deployed to: ${openCrateFactory.address}`);
 
     // Set factory in NFT contract
-    console.log("⚙️ Setting factory in OpenCrateNFTEnhanced...");
-    const nftContract = await viem.getContractAt("OpenCrateNFTEnhanced", openCrateNFT.address);
+    console.log("⚙️ Setting factory in OpenCrateNFT...");
+    const nftContract = await viem.getContractAt("OpenCrateNFT", openCrateNFT.address);
     await nftContract.write.setFactory([openCrateFactory.address]);
     console.log("✅ Factory set successfully");
 
     // 9. Add supported tokens to NFT
-    console.log("⚙️ Adding supported tokens to OpenCrateNFTEnhanced...");
+    console.log("⚙️ Adding supported tokens to OpenCrateNFT...");
     await nftContract.write.addSupportedToken([
       mockUSDC.address,
       parseUnits("1", 2), // $1.00 USD
