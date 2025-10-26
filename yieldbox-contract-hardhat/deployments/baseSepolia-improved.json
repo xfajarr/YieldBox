@@ -1,0 +1,23 @@
+{
+  "network": "baseSepolia",
+  "deployer": "0x1b2fc03ad5405347a60b407929633ffc544f1db6",
+  "treasury": "0x1b2fc03ad5405347a60b407929633ffc544f1db6",
+  "deployments": {
+    "MockUSDC": "0x18d6b03a4a0499077a2dc8c45fff8da10af16f64",
+    "MockIDRX": "0x7aa2608eea7679fa66196decd78989bb13dacd38",
+    "MockPriceOracle": "0xb5c7dd9e79f73c15e9d7d385dd94e900e0088251",
+    "ERC6551Registry": "0xd81fd0e0efb5c8db4ba2b268896c2548416cb026",
+    "ERC6551Account": "0xcf49794cc85c8f4e2022b88127134ae2c206c402",
+    "OpenCrateStrategyRegistry": "0x47503954b7626724fdd0dd996ac1d69b8a7d124c",
+    "MockYieldProtocol": "0x971a23efc273b07812807b807da5be3f6901155d",
+    "MockYieldAdapter": "0x07bb3370af8cd0c28dd2c8ca7186d8b790d34458",
+    "OpenCrateNFT": "0xad9604b29a892a1f06bef534c4f5cea5fa729ca7",
+    "OpenCrateFactory": "0x8a966e800ecd5025190f767232cb748f0917407b"
+  },
+  "priceInfo": {
+    "exchangeRate": "1 USD = 16,500 IDR",
+    "usdcPrice": "1 USDC = $1.00",
+    "idrxPrice": "1 IDRX = Rp 1.00 (16,500 IDRX = $1.00 ≈ $0.0000606 per IDRX)"
+  },
+  "timestamp": "2025-10-26T14:05:39.515Z"
+}
