@@ -1,1 +1,1486 @@
-[{"inputs":[{"internalType":"contract OpenCrateNFT","name":"crateNFT_","type":"address"},{"internalType":"contract IERC6551Registry","name":"registry_","type":"address"},{"internalType":"address","name":"accountImplementation_","type":"address"},{"internalType":"contract OpenCrateStrategyRegistry","name":"strategyRegistry_","type":"address"},{"internalType":"address","name":"owner_","type":"address"}],"stateMutability":"nonpayable","type":"constructor"},{"inputs":[],"name":"AccountCreationFailed","type":"error"},{"inputs":[{"internalType":"uint256","name":"tokenId","type":"uint256"}],"name":"CrateUnknown","type":"error"},{"inputs":[{"internalType":"address","name":"owner","type":"address"}],"name":"OwnableInvalidOwner","type":"error"},{"inputs":[{"internalType":"address","name":"account","type":"address"}],"name":"OwnableUnauthorizedAccount","type":"error"},{"inputs":[{"internalType":"uint256","name":"strategyId","type":"uint256"}],"name":"StrategyInactive","type":"error"},{"inputs":[{"internalType":"uint256","name":"strategyId","type":"uint256"}],"name":"StrategyNotFound","type":"error"},{"inputs":[{"internalType":"uint8","name":"expected","type":"uint8"},{"internalType":"uint8","name":"provided","type":"uint8"}],"name":"StrategyRiskMismatch","type":"error"},{"inputs":[],"name":"ZeroAddress","type":"error"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"newImplementation","type":"address"}],"name":"AccountImplementationUpdated","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"uint256","name":"tokenId","type":"uint256"},{"indexed":true,"internalType":"address","name":"owner","type":"address"},{"indexed":true,"internalType":"address","name":"account","type":"address"},{"indexed":false,"internalType":"uint256","name":"strategyId","type":"uint256"},{"indexed":false,"internalType":"uint8","name":"riskLevel","type":"uint8"},{"indexed":false,"internalType":"address","name":"adapter","type":"address"},{"indexed":false,"internalType":"uint256","name":"priceUsd","type":"uint256"},{"indexed":false,"internalType":"uint16","name":"boostMultiplierBps","type":"uint16"},{"indexed":false,"internalType":"uint64","name":"lockedUntil","type":"uint64"},{"indexed":false,"internalType":"address","name":"creator","type":"address"},{"indexed":false,"internalType":"uint16","name":"revenueShareBps","type":"uint16"},{"indexed":false,"internalType":"uint16","name":"platformFeeBps","type":"uint16"},{"indexed":false,"internalType":"uint16","name":"performanceFeeBps","type":"uint16"},{"indexed":false,"internalType":"uint256","name":"positionCount","type":"uint256"}],"name":"CrateCreated","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"previousOwner","type":"address"},{"indexed":true,"internalType":"address","name":"newOwner","type":"address"}],"name":"OwnershipTransferred","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"newRegistry","type":"address"}],"name":"StrategyRegistryUpdated","type":"event"},{"inputs":[],"name":"accountImplementation","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint256","name":"tokenId","type":"uint256"}],"name":"accountOf","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint256","name":"tokenId","type":"uint256"}],"name":"crateAdapter","outputs":[{"internalType":"address","name":"adapter","type":"address"},{"internalType":"bytes","name":"adapterData","type":"bytes"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint256","name":"tokenId","type":"uint256"}],"name":"crateDeployment","outputs":[{"components":[{"internalType":"uint256","name":"strategyId","type":"uint256"},{"internalType":"uint8","name":"riskLevel","type":"uint8"},{"internalType":"uint256","name":"salt","type":"uint256"},{"internalType":"address","name":"account","type":"address"},{"internalType":"address","name":"adapter","type":"address"},{"internalType":"bytes","name":"adapterData","type":"bytes"},{"internalType":"uint256","name":"positionCount","type":"uint256"}],"internalType":"struct OpenCrateFactory.CrateDeployment","name":"","type":"tuple"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"crateNFT","outputs":[{"internalType":"contract OpenCrateNFT","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[{"components":[{"internalType":"address","name":"to","type":"address"},{"internalType":"uint8","name":"riskLevel","type":"uint8"},{"internalType":"uint256","name":"strategyId","type":"uint256"},{"internalType":"uint256","name":"salt","type":"uint256"},{"internalType":"uint256","name":"priceUsd","type":"uint256"},{"internalType":"uint16","name":"boostMultiplierBps","type":"uint16"},{"internalType":"uint64","name":"lockDuration","type":"uint64"},{"internalType":"address","name":"creator","type":"address"},{"internalType":"uint16","name":"revenueShareBps","type":"uint16"},{"internalType":"uint16","name":"platformFeeBps","type":"uint16"},{"internalType":"uint16","name":"performanceFeeBps","type":"uint16"},{"internalType":"string","name":"riskDisclosure","type":"string"},{"internalType":"string","name":"feeDisclosure","type":"string"},{"internalType":"uint64","name":"lastRebalanceAt","type":"uint64"},{"internalType":"uint64","name":"nextHarvestAt","type":"uint64"},{"internalType":"uint256","name":"accruedYieldUsd","type":"uint256"},{"internalType":"bool","name":"boostActive","type":"bool"},{"internalType":"bytes","name":"accountInitData","type":"bytes"},{"internalType":"bytes","name":"adapterData","type":"bytes"}],"internalType":"struct OpenCrateFactory.MintParams","name":"params","type":"tuple"},{"components":[{"internalType":"string","name":"protocol","type":"string"},{"internalType":"string","name":"asset","type":"string"},{"internalType":"string","name":"strategyType","type":"string"},{"internalType":"string","name":"chain","type":"string"},{"internalType":"string","name":"infoURL","type":"string"},{"internalType":"uint16","name":"allocationBps","type":"uint16"},{"internalType":"uint256","name":"allocationUsd","type":"uint256"},{"internalType":"int256","name":"netApyBps","type":"int256"},{"internalType":"int256","name":"baseAprBps","type":"int256"},{"internalType":"int256","name":"incentivesAprBps","type":"int256"},{"internalType":"int256","name":"feeBps","type":"int256"},{"internalType":"uint8","name":"riskScore","type":"uint8"},{"internalType":"uint64","name":"openedAt","type":"uint64"},{"internalType":"uint64","name":"lastRebalancedAt","type":"uint64"},{"internalType":"uint64","name":"nextHarvestAt","type":"uint64"},{"internalType":"uint256","name":"accruedYieldUsd","type":"uint256"}],"internalType":"struct OpenCrateNFT.PositionPayload[]","name":"positions","type":"tuple[]"}],"name":"mintCrate","outputs":[{"internalType":"uint256","name":"tokenId","type":"uint256"},{"internalType":"address","name":"account","type":"address"}],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"owner","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint256","name":"tokenId","type":"uint256"},{"internalType":"uint256","name":"salt","type":"uint256"}],"name":"predictAccount","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint256","name":"salt","type":"uint256"}],"name":"predictAccountForNext","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"registry","outputs":[{"internalType":"contract IERC6551Registry","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"renounceOwnership","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"newImplementation","type":"address"}],"name":"setAccountImplementation","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"contract OpenCrateStrategyRegistry","name":"newRegistry","type":"address"}],"name":"setStrategyRegistry","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"strategyRegistry","outputs":[{"internalType":"contract OpenCrateStrategyRegistry","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"newOwner","type":"address"}],"name":"transferOwnership","outputs":[],"stateMutability":"nonpayable","type":"function"}]
+[
+    {
+        "inputs": [
+            {
+                "internalType": "address",
+                "name": "crateNFTAddress",
+                "type": "address"
+            },
+            {
+                "internalType": "address",
+                "name": "erc6551RegistryAddress",
+                "type": "address"
+            },
+            {
+                "internalType": "address",
+                "name": "erc6551AccountAddress",
+                "type": "address"
+            },
+            {
+                "internalType": "address",
+                "name": "strategyRegistryAddress",
+                "type": "address"
+            },
+            {
+                "internalType": "address",
+                "name": "treasuryAddress",
+                "type": "address"
+            },
+            {
+                "internalType": "address",
+                "name": "initialOwner",
+                "type": "address"
+            }
+        ],
+        "stateMutability": "nonpayable",
+        "type": "constructor"
+    },
+    {
+        "inputs": [],
+        "name": "AccountCreationFailed",
+        "type": "error"
+    },
+    {
+        "inputs": [],
+        "name": "EnforcedPause",
+        "type": "error"
+    },
+    {
+        "inputs": [],
+        "name": "ExpectedPause",
+        "type": "error"
+    },
+    {
+        "inputs": [],
+        "name": "InsufficientPayment",
+        "type": "error"
+    },
+    {
+        "inputs": [],
+        "name": "InvalidLockupOption",
+        "type": "error"
+    },
+    {
+        "inputs": [],
+        "name": "InvalidMultiplier",
+        "type": "error"
+    },
+    {
+        "inputs": [],
+        "name": "InvalidPurchaseAmount",
+        "type": "error"
+    },
+    {
+        "inputs": [],
+        "name": "InvalidTemplate",
+        "type": "error"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "address",
+                "name": "owner",
+                "type": "address"
+            }
+        ],
+        "name": "OwnableInvalidOwner",
+        "type": "error"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "address",
+                "name": "account",
+                "type": "address"
+            }
+        ],
+        "name": "OwnableUnauthorizedAccount",
+        "type": "error"
+    },
+    {
+        "inputs": [],
+        "name": "PaymentTransferFailed",
+        "type": "error"
+    },
+    {
+        "inputs": [],
+        "name": "ReentrancyGuardReentrantCall",
+        "type": "error"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "address",
+                "name": "token",
+                "type": "address"
+            }
+        ],
+        "name": "SafeERC20FailedOperation",
+        "type": "error"
+    },
+    {
+        "inputs": [],
+        "name": "SlippageExceeded",
+        "type": "error"
+    },
+    {
+        "inputs": [],
+        "name": "TemplateDescriptionRequired",
+        "type": "error"
+    },
+    {
+        "inputs": [],
+        "name": "TemplateLockupRequired",
+        "type": "error"
+    },
+    {
+        "inputs": [],
+        "name": "TemplateNameRequired",
+        "type": "error"
+    },
+    {
+        "inputs": [],
+        "name": "TemplateNotFound",
+        "type": "error"
+    },
+    {
+        "inputs": [],
+        "name": "TemplatePaymentTokenRequired",
+        "type": "error"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "address",
+                "name": "token",
+                "type": "address"
+            }
+        ],
+        "name": "TokenNotSupported",
+        "type": "error"
+    },
+    {
+        "inputs": [],
+        "name": "Unauthorized",
+        "type": "error"
+    },
+    {
+        "inputs": [],
+        "name": "ZeroAddress",
+        "type": "error"
+    },
+    {
+        "anonymous": false,
+        "inputs": [
+            {
+                "indexed": true,
+                "internalType": "uint256",
+                "name": "templateId",
+                "type": "uint256"
+            },
+            {
+                "indexed": true,
+                "internalType": "uint256",
+                "name": "tokenId",
+                "type": "uint256"
+            },
+            {
+                "indexed": true,
+                "internalType": "address",
+                "name": "purchaser",
+                "type": "address"
+            },
+            {
+                "indexed": false,
+                "internalType": "address",
+                "name": "paymentToken",
+                "type": "address"
+            },
+            {
+                "indexed": false,
+                "internalType": "uint256",
+                "name": "paymentAmount",
+                "type": "uint256"
+            },
+            {
+                "indexed": false,
+                "internalType": "uint64",
+                "name": "lockupDuration",
+                "type": "uint64"
+            },
+            {
+                "indexed": false,
+                "internalType": "uint16",
+                "name": "multiplierBps",
+                "type": "uint16"
+            },
+            {
+                "indexed": false,
+                "internalType": "uint256",
+                "name": "timestamp",
+                "type": "uint256"
+            }
+        ],
+        "name": "CratePurchased",
+        "type": "event"
+    },
+    {
+        "anonymous": false,
+        "inputs": [
+            {
+                "indexed": true,
+                "internalType": "uint256",
+                "name": "templateId",
+                "type": "uint256"
+            },
+            {
+                "indexed": false,
+                "internalType": "string",
+                "name": "name",
+                "type": "string"
+            },
+            {
+                "indexed": false,
+                "internalType": "uint256",
+                "name": "basePriceUsd",
+                "type": "uint256"
+            },
+            {
+                "indexed": false,
+                "internalType": "uint256",
+                "name": "version",
+                "type": "uint256"
+            }
+        ],
+        "name": "CrateTemplateCreated",
+        "type": "event"
+    },
+    {
+        "anonymous": false,
+        "inputs": [
+            {
+                "indexed": true,
+                "internalType": "uint256",
+                "name": "templateId",
+                "type": "uint256"
+            }
+        ],
+        "name": "CrateTemplateDisabled",
+        "type": "event"
+    },
+    {
+        "anonymous": false,
+        "inputs": [
+            {
+                "indexed": true,
+                "internalType": "uint256",
+                "name": "templateId",
+                "type": "uint256"
+            },
+            {
+                "indexed": false,
+                "internalType": "uint256",
+                "name": "newVersion",
+                "type": "uint256"
+            }
+        ],
+        "name": "CrateTemplateUpdated",
+        "type": "event"
+    },
+    {
+        "anonymous": false,
+        "inputs": [
+            {
+                "indexed": true,
+                "internalType": "address",
+                "name": "token",
+                "type": "address"
+            },
+            {
+                "indexed": false,
+                "internalType": "uint256",
+                "name": "amount",
+                "type": "uint256"
+            },
+            {
+                "indexed": true,
+                "internalType": "address",
+                "name": "recipient",
+                "type": "address"
+            }
+        ],
+        "name": "EmergencyWithdraw",
+        "type": "event"
+    },
+    {
+        "anonymous": false,
+        "inputs": [
+            {
+                "indexed": true,
+                "internalType": "uint256",
+                "name": "templateId",
+                "type": "uint256"
+            },
+            {
+                "indexed": false,
+                "internalType": "uint64",
+                "name": "duration",
+                "type": "uint64"
+            },
+            {
+                "indexed": false,
+                "internalType": "uint16",
+                "name": "multiplierBps",
+                "type": "uint16"
+            }
+        ],
+        "name": "LockupOptionAdded",
+        "type": "event"
+    },
+    {
+        "anonymous": false,
+        "inputs": [
+            {
+                "indexed": true,
+                "internalType": "uint256",
+                "name": "templateId",
+                "type": "uint256"
+            },
+            {
+                "indexed": false,
+                "internalType": "uint64",
+                "name": "duration",
+                "type": "uint64"
+            },
+            {
+                "indexed": false,
+                "internalType": "uint16",
+                "name": "multiplierBps",
+                "type": "uint16"
+            }
+        ],
+        "name": "LockupOptionRemoved",
+        "type": "event"
+    },
+    {
+        "anonymous": false,
+        "inputs": [
+            {
+                "indexed": true,
+                "internalType": "uint256",
+                "name": "templateId",
+                "type": "uint256"
+            },
+            {
+                "indexed": false,
+                "internalType": "uint64",
+                "name": "duration",
+                "type": "uint64"
+            },
+            {
+                "indexed": false,
+                "internalType": "uint16",
+                "name": "multiplierBps",
+                "type": "uint16"
+            }
+        ],
+        "name": "LockupOptionUpdated",
+        "type": "event"
+    },
+    {
+        "anonymous": false,
+        "inputs": [
+            {
+                "indexed": true,
+                "internalType": "address",
+                "name": "previousOwner",
+                "type": "address"
+            },
+            {
+                "indexed": true,
+                "internalType": "address",
+                "name": "newOwner",
+                "type": "address"
+            }
+        ],
+        "name": "OwnershipTransferred",
+        "type": "event"
+    },
+    {
+        "anonymous": false,
+        "inputs": [
+            {
+                "indexed": false,
+                "internalType": "address",
+                "name": "account",
+                "type": "address"
+            }
+        ],
+        "name": "Paused",
+        "type": "event"
+    },
+    {
+        "anonymous": false,
+        "inputs": [
+            {
+                "indexed": true,
+                "internalType": "address",
+                "name": "oldTreasury",
+                "type": "address"
+            },
+            {
+                "indexed": true,
+                "internalType": "address",
+                "name": "newTreasury",
+                "type": "address"
+            }
+        ],
+        "name": "TreasuryUpdated",
+        "type": "event"
+    },
+    {
+        "anonymous": false,
+        "inputs": [
+            {
+                "indexed": false,
+                "internalType": "address",
+                "name": "account",
+                "type": "address"
+            }
+        ],
+        "name": "Unpaused",
+        "type": "event"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "uint256",
+                "name": "templateId",
+                "type": "uint256"
+            },
+            {
+                "internalType": "uint64",
+                "name": "duration",
+                "type": "uint64"
+            },
+            {
+                "internalType": "uint16",
+                "name": "multiplierBps",
+                "type": "uint16"
+            }
+        ],
+        "name": "addLockupOption",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "uint256",
+                "name": "templateId",
+                "type": "uint256"
+            },
+            {
+                "internalType": "uint64",
+                "name": "lockupDuration",
+                "type": "uint64"
+            }
+        ],
+        "name": "calculatePurchasePrice",
+        "outputs": [
+            {
+                "internalType": "uint256",
+                "name": "priceUsd",
+                "type": "uint256"
+            },
+            {
+                "internalType": "uint16",
+                "name": "multiplierBps",
+                "type": "uint16"
+            },
+            {
+                "internalType": "uint256[]",
+                "name": "requiredTokenAmounts",
+                "type": "uint256[]"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "crateNFT",
+        "outputs": [
+            {
+                "internalType": "contract OpenCrateNFT",
+                "name": "",
+                "type": "address"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "string",
+                "name": "name",
+                "type": "string"
+            },
+            {
+                "internalType": "string",
+                "name": "description",
+                "type": "string"
+            },
+            {
+                "internalType": "uint8",
+                "name": "riskLevel",
+                "type": "uint8"
+            },
+            {
+                "internalType": "uint256",
+                "name": "strategyId",
+                "type": "uint256"
+            },
+            {
+                "internalType": "uint256",
+                "name": "basePriceUsd",
+                "type": "uint256"
+            },
+            {
+                "components": [
+                    {
+                        "internalType": "string",
+                        "name": "protocol",
+                        "type": "string"
+                    },
+                    {
+                        "internalType": "string",
+                        "name": "asset",
+                        "type": "string"
+                    },
+                    {
+                        "internalType": "string",
+                        "name": "strategyType",
+                        "type": "string"
+                    },
+                    {
+                        "internalType": "string",
+                        "name": "chain",
+                        "type": "string"
+                    },
+                    {
+                        "internalType": "string",
+                        "name": "infoURL",
+                        "type": "string"
+                    },
+                    {
+                        "internalType": "uint16",
+                        "name": "allocationBps",
+                        "type": "uint16"
+                    },
+                    {
+                        "internalType": "uint256",
+                        "name": "allocationUsd",
+                        "type": "uint256"
+                    },
+                    {
+                        "internalType": "int256",
+                        "name": "netApyBps",
+                        "type": "int256"
+                    },
+                    {
+                        "internalType": "int256",
+                        "name": "baseAprBps",
+                        "type": "int256"
+                    },
+                    {
+                        "internalType": "int256",
+                        "name": "incentivesAprBps",
+                        "type": "int256"
+                    },
+                    {
+                        "internalType": "int256",
+                        "name": "feeBps",
+                        "type": "int256"
+                    },
+                    {
+                        "internalType": "uint8",
+                        "name": "riskScore",
+                        "type": "uint8"
+                    },
+                    {
+                        "internalType": "uint64",
+                        "name": "openedAt",
+                        "type": "uint64"
+                    },
+                    {
+                        "internalType": "uint64",
+                        "name": "lastRebalancedAt",
+                        "type": "uint64"
+                    },
+                    {
+                        "internalType": "uint64",
+                        "name": "nextHarvestAt",
+                        "type": "uint64"
+                    },
+                    {
+                        "internalType": "uint256",
+                        "name": "accruedYieldUsd",
+                        "type": "uint256"
+                    }
+                ],
+                "internalType": "struct OpenCrateNFT.PositionPayload[]",
+                "name": "positions",
+                "type": "tuple[]"
+            },
+            {
+                "internalType": "uint16",
+                "name": "revenueShareBps",
+                "type": "uint16"
+            },
+            {
+                "internalType": "uint16",
+                "name": "platformFeeBps",
+                "type": "uint16"
+            },
+            {
+                "internalType": "uint16",
+                "name": "performanceFeeBps",
+                "type": "uint16"
+            },
+            {
+                "internalType": "string",
+                "name": "riskDisclosure",
+                "type": "string"
+            },
+            {
+                "internalType": "string",
+                "name": "feeDisclosure",
+                "type": "string"
+            },
+            {
+                "components": [
+                    {
+                        "internalType": "uint64",
+                        "name": "duration",
+                        "type": "uint64"
+                    },
+                    {
+                        "internalType": "uint16",
+                        "name": "multiplierBps",
+                        "type": "uint16"
+                    },
+                    {
+                        "internalType": "bool",
+                        "name": "enabled",
+                        "type": "bool"
+                    }
+                ],
+                "internalType": "struct OpenCrateFactory.LockupOption[]",
+                "name": "lockupOptions",
+                "type": "tuple[]"
+            },
+            {
+                "internalType": "address[]",
+                "name": "supportedPaymentTokens",
+                "type": "address[]"
+            }
+        ],
+        "name": "createCrateTemplate",
+        "outputs": [
+            {
+                "internalType": "uint256",
+                "name": "templateId",
+                "type": "uint256"
+            }
+        ],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "uint256",
+                "name": "templateId",
+                "type": "uint256"
+            }
+        ],
+        "name": "disableCrateTemplate",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "uint256",
+                "name": "templateId",
+                "type": "uint256"
+            }
+        ],
+        "name": "emergencyPauseTemplate",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "uint256",
+                "name": "templateId",
+                "type": "uint256"
+            }
+        ],
+        "name": "emergencyUnpauseTemplate",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "address",
+                "name": "token",
+                "type": "address"
+            },
+            {
+                "internalType": "uint256",
+                "name": "amount",
+                "type": "uint256"
+            },
+            {
+                "internalType": "address",
+                "name": "recipient",
+                "type": "address"
+            }
+        ],
+        "name": "emergencyWithdrawToken",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "erc6551AccountImplementation",
+        "outputs": [
+            {
+                "internalType": "address",
+                "name": "",
+                "type": "address"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "erc6551Registry",
+        "outputs": [
+            {
+                "internalType": "contract ERC6551Registry",
+                "name": "",
+                "type": "address"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "getActiveTemplateIds",
+        "outputs": [
+            {
+                "internalType": "uint256[]",
+                "name": "",
+                "type": "uint256[]"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "uint256",
+                "name": "tokenId",
+                "type": "uint256"
+            }
+        ],
+        "name": "getCratePurchase",
+        "outputs": [
+            {
+                "components": [
+                    {
+                        "internalType": "uint256",
+                        "name": "templateId",
+                        "type": "uint256"
+                    },
+                    {
+                        "internalType": "uint64",
+                        "name": "lockupDuration",
+                        "type": "uint64"
+                    },
+                    {
+                        "internalType": "uint16",
+                        "name": "selectedMultiplierBps",
+                        "type": "uint16"
+                    },
+                    {
+                        "internalType": "address",
+                        "name": "paymentToken",
+                        "type": "address"
+                    },
+                    {
+                        "internalType": "uint256",
+                        "name": "paymentAmount",
+                        "type": "uint256"
+                    },
+                    {
+                        "internalType": "address",
+                        "name": "purchaser",
+                        "type": "address"
+                    },
+                    {
+                        "internalType": "uint64",
+                        "name": "purchasedAt",
+                        "type": "uint64"
+                    },
+                    {
+                        "internalType": "uint256",
+                        "name": "templateVersion",
+                        "type": "uint256"
+                    }
+                ],
+                "internalType": "struct OpenCrateFactory.CratePurchase",
+                "name": "",
+                "type": "tuple"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "uint256",
+                "name": "templateId",
+                "type": "uint256"
+            }
+        ],
+        "name": "getCrateTemplate",
+        "outputs": [
+            {
+                "components": [
+                    {
+                        "internalType": "string",
+                        "name": "name",
+                        "type": "string"
+                    },
+                    {
+                        "internalType": "string",
+                        "name": "description",
+                        "type": "string"
+                    },
+                    {
+                        "internalType": "uint8",
+                        "name": "riskLevel",
+                        "type": "uint8"
+                    },
+                    {
+                        "internalType": "uint256",
+                        "name": "strategyId",
+                        "type": "uint256"
+                    },
+                    {
+                        "internalType": "uint256",
+                        "name": "basePriceUsd",
+                        "type": "uint256"
+                    },
+                    {
+                        "components": [
+                            {
+                                "internalType": "string",
+                                "name": "protocol",
+                                "type": "string"
+                            },
+                            {
+                                "internalType": "string",
+                                "name": "asset",
+                                "type": "string"
+                            },
+                            {
+                                "internalType": "string",
+                                "name": "strategyType",
+                                "type": "string"
+                            },
+                            {
+                                "internalType": "string",
+                                "name": "chain",
+                                "type": "string"
+                            },
+                            {
+                                "internalType": "string",
+                                "name": "infoURL",
+                                "type": "string"
+                            },
+                            {
+                                "internalType": "uint16",
+                                "name": "allocationBps",
+                                "type": "uint16"
+                            },
+                            {
+                                "internalType": "uint256",
+                                "name": "allocationUsd",
+                                "type": "uint256"
+                            },
+                            {
+                                "internalType": "int256",
+                                "name": "netApyBps",
+                                "type": "int256"
+                            },
+                            {
+                                "internalType": "int256",
+                                "name": "baseAprBps",
+                                "type": "int256"
+                            },
+                            {
+                                "internalType": "int256",
+                                "name": "incentivesAprBps",
+                                "type": "int256"
+                            },
+                            {
+                                "internalType": "int256",
+                                "name": "feeBps",
+                                "type": "int256"
+                            },
+                            {
+                                "internalType": "uint8",
+                                "name": "riskScore",
+                                "type": "uint8"
+                            },
+                            {
+                                "internalType": "uint64",
+                                "name": "openedAt",
+                                "type": "uint64"
+                            },
+                            {
+                                "internalType": "uint64",
+                                "name": "lastRebalancedAt",
+                                "type": "uint64"
+                            },
+                            {
+                                "internalType": "uint64",
+                                "name": "nextHarvestAt",
+                                "type": "uint64"
+                            },
+                            {
+                                "internalType": "uint256",
+                                "name": "accruedYieldUsd",
+                                "type": "uint256"
+                            }
+                        ],
+                        "internalType": "struct OpenCrateNFT.PositionPayload[]",
+                        "name": "positions",
+                        "type": "tuple[]"
+                    },
+                    {
+                        "internalType": "uint16",
+                        "name": "revenueShareBps",
+                        "type": "uint16"
+                    },
+                    {
+                        "internalType": "uint16",
+                        "name": "platformFeeBps",
+                        "type": "uint16"
+                    },
+                    {
+                        "internalType": "uint16",
+                        "name": "performanceFeeBps",
+                        "type": "uint16"
+                    },
+                    {
+                        "internalType": "string",
+                        "name": "riskDisclosure",
+                        "type": "string"
+                    },
+                    {
+                        "internalType": "string",
+                        "name": "feeDisclosure",
+                        "type": "string"
+                    },
+                    {
+                        "components": [
+                            {
+                                "internalType": "uint64",
+                                "name": "duration",
+                                "type": "uint64"
+                            },
+                            {
+                                "internalType": "uint16",
+                                "name": "multiplierBps",
+                                "type": "uint16"
+                            },
+                            {
+                                "internalType": "bool",
+                                "name": "enabled",
+                                "type": "bool"
+                            }
+                        ],
+                        "internalType": "struct OpenCrateFactory.LockupOption[]",
+                        "name": "lockupOptions",
+                        "type": "tuple[]"
+                    },
+                    {
+                        "internalType": "address[]",
+                        "name": "supportedPaymentTokens",
+                        "type": "address[]"
+                    },
+                    {
+                        "internalType": "uint256",
+                        "name": "version",
+                        "type": "uint256"
+                    }
+                ],
+                "internalType": "struct OpenCrateFactory.CrateTemplate",
+                "name": "",
+                "type": "tuple"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "uint256",
+                "name": "templateId",
+                "type": "uint256"
+            },
+            {
+                "internalType": "uint64",
+                "name": "duration",
+                "type": "uint64"
+            }
+        ],
+        "name": "getLockupOption",
+        "outputs": [
+            {
+                "components": [
+                    {
+                        "internalType": "uint64",
+                        "name": "duration",
+                        "type": "uint64"
+                    },
+                    {
+                        "internalType": "uint16",
+                        "name": "multiplierBps",
+                        "type": "uint16"
+                    },
+                    {
+                        "internalType": "bool",
+                        "name": "enabled",
+                        "type": "bool"
+                    }
+                ],
+                "internalType": "struct OpenCrateFactory.LockupOption",
+                "name": "",
+                "type": "tuple"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "uint256",
+                "name": "templateId",
+                "type": "uint256"
+            }
+        ],
+        "name": "getLockupOptions",
+        "outputs": [
+            {
+                "components": [
+                    {
+                        "internalType": "uint64",
+                        "name": "duration",
+                        "type": "uint64"
+                    },
+                    {
+                        "internalType": "uint16",
+                        "name": "multiplierBps",
+                        "type": "uint16"
+                    },
+                    {
+                        "internalType": "bool",
+                        "name": "enabled",
+                        "type": "bool"
+                    }
+                ],
+                "internalType": "struct OpenCrateFactory.LockupOption[]",
+                "name": "",
+                "type": "tuple[]"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "getTemplateIds",
+        "outputs": [
+            {
+                "internalType": "uint256[]",
+                "name": "",
+                "type": "uint256[]"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "nextTemplateId",
+        "outputs": [
+            {
+                "internalType": "uint256",
+                "name": "",
+                "type": "uint256"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "owner",
+        "outputs": [
+            {
+                "internalType": "address",
+                "name": "",
+                "type": "address"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "pause",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "paused",
+        "outputs": [
+            {
+                "internalType": "bool",
+                "name": "",
+                "type": "bool"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "uint256",
+                "name": "templateId",
+                "type": "uint256"
+            },
+            {
+                "internalType": "uint64",
+                "name": "lockupDuration",
+                "type": "uint64"
+            },
+            {
+                "internalType": "address",
+                "name": "paymentToken",
+                "type": "address"
+            },
+            {
+                "internalType": "uint256",
+                "name": "paymentAmount",
+                "type": "uint256"
+            },
+            {
+                "internalType": "uint256",
+                "name": "maxPaymentAmount",
+                "type": "uint256"
+            }
+        ],
+        "name": "purchaseCrate",
+        "outputs": [
+            {
+                "internalType": "uint256",
+                "name": "tokenId",
+                "type": "uint256"
+            }
+        ],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "uint256",
+                "name": "templateId",
+                "type": "uint256"
+            },
+            {
+                "internalType": "uint64",
+                "name": "duration",
+                "type": "uint64"
+            }
+        ],
+        "name": "removeLockupOption",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "renounceOwnership",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "address",
+                "name": "newTreasury",
+                "type": "address"
+            }
+        ],
+        "name": "setTreasury",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "strategyRegistry",
+        "outputs": [
+            {
+                "internalType": "contract OpenCrateStrategyRegistry",
+                "name": "",
+                "type": "address"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "totalTemplates",
+        "outputs": [
+            {
+                "internalType": "uint256",
+                "name": "",
+                "type": "uint256"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "address",
+                "name": "newOwner",
+                "type": "address"
+            }
+        ],
+        "name": "transferOwnership",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "treasury",
+        "outputs": [
+            {
+                "internalType": "address",
+                "name": "",
+                "type": "address"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "unpause",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "uint256",
+                "name": "templateId",
+                "type": "uint256"
+            },
+            {
+                "internalType": "string",
+                "name": "name",
+                "type": "string"
+            },
+            {
+                "internalType": "string",
+                "name": "description",
+                "type": "string"
+            },
+            {
+                "components": [
+                    {
+                        "internalType": "string",
+                        "name": "protocol",
+                        "type": "string"
+                    },
+                    {
+                        "internalType": "string",
+                        "name": "asset",
+                        "type": "string"
+                    },
+                    {
+                        "internalType": "string",
+                        "name": "strategyType",
+                        "type": "string"
+                    },
+                    {
+                        "internalType": "string",
+                        "name": "chain",
+                        "type": "string"
+                    },
+                    {
+                        "internalType": "string",
+                        "name": "infoURL",
+                        "type": "string"
+                    },
+                    {
+                        "internalType": "uint16",
+                        "name": "allocationBps",
+                        "type": "uint16"
+                    },
+                    {
+                        "internalType": "uint256",
+                        "name": "allocationUsd",
+                        "type": "uint256"
+                    },
+                    {
+                        "internalType": "int256",
+                        "name": "netApyBps",
+                        "type": "int256"
+                    },
+                    {
+                        "internalType": "int256",
+                        "name": "baseAprBps",
+                        "type": "int256"
+                    },
+                    {
+                        "internalType": "int256",
+                        "name": "incentivesAprBps",
+                        "type": "int256"
+                    },
+                    {
+                        "internalType": "int256",
+                        "name": "feeBps",
+                        "type": "int256"
+                    },
+                    {
+                        "internalType": "uint8",
+                        "name": "riskScore",
+                        "type": "uint8"
+                    },
+                    {
+                        "internalType": "uint64",
+                        "name": "openedAt",
+                        "type": "uint64"
+                    },
+                    {
+                        "internalType": "uint64",
+                        "name": "lastRebalancedAt",
+                        "type": "uint64"
+                    },
+                    {
+                        "internalType": "uint64",
+                        "name": "nextHarvestAt",
+                        "type": "uint64"
+                    },
+                    {
+                        "internalType": "uint256",
+                        "name": "accruedYieldUsd",
+                        "type": "uint256"
+                    }
+                ],
+                "internalType": "struct OpenCrateNFT.PositionPayload[]",
+                "name": "positions",
+                "type": "tuple[]"
+            },
+            {
+                "components": [
+                    {
+                        "internalType": "uint64",
+                        "name": "duration",
+                        "type": "uint64"
+                    },
+                    {
+                        "internalType": "uint16",
+                        "name": "multiplierBps",
+                        "type": "uint16"
+                    },
+                    {
+                        "internalType": "bool",
+                        "name": "enabled",
+                        "type": "bool"
+                    }
+                ],
+                "internalType": "struct OpenCrateFactory.LockupOption[]",
+                "name": "lockupOptions",
+                "type": "tuple[]"
+            },
+            {
+                "internalType": "address[]",
+                "name": "supportedPaymentTokens",
+                "type": "address[]"
+            }
+        ],
+        "name": "updateCrateTemplate",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "uint256",
+                "name": "templateId",
+                "type": "uint256"
+            },
+            {
+                "internalType": "uint64",
+                "name": "duration",
+                "type": "uint64"
+            },
+            {
+                "internalType": "uint16",
+                "name": "multiplierBps",
+                "type": "uint16"
+            }
+        ],
+        "name": "updateLockupOption",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    }
+]

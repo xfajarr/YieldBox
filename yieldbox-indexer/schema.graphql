@@ -1,3 +1,47 @@
+type MockPriceOracle_OwnershipTransferred {
+  id: ID!
+  previousOwner: String!
+  newOwner: String!
+}
+
+type MockPriceOracle_PriceUpdated {
+  id: ID!
+  token: String!
+  priceUsd: BigInt!
+  timestamp: BigInt!
+}
+
+type MockPriceOracle_TokenAdded {
+  id: ID!
+  token: String!
+  priceUsd: BigInt!
+}
+
+type MockPriceOracle_TokenRemoved {
+  id: ID!
+  token: String!
+}
+
+type MockUSDC_Approval {
+  id: ID!
+  owner: String!
+  spender: String!
+  value: BigInt!
+}
+
+type MockUSDC_OwnershipTransferred {
+  id: ID!
+  previousOwner: String!
+  newOwner: String!
+}
+
+type MockUSDC_Transfer {
+  id: ID!
+  from: String!
+  to: String!
+  value: BigInt!
+}
+
 type MockYieldAdapter_Deposited {
   id: ID!
   account: String!
@@ -71,27 +115,63 @@ type MockYieldProtocol_YieldClaimed {
   amount: BigInt!
 }
 
-type OpenCrateFactory_AccountImplementationUpdated {
+type OpenCrateFactory_CratePurchased {
   id: ID!
-  newImplementation: String!
+  templateId: BigInt!
+  tokenId: BigInt!
+  purchaser: String!
+  paymentToken: String!
+  paymentAmount: BigInt!
+  lockupDuration: BigInt!
+  multiplierBps: BigInt!
+  timestamp: BigInt!
 }
 
-type OpenCrateFactory_CrateCreated {
+type OpenCrateFactory_CrateTemplateCreated {
   id: ID!
-  tokenId: BigInt!
-  owner: String!
-  account: String!
-  strategyId: BigInt!
-  riskLevel: BigInt!
-  adapter: String!
-  priceUsd: BigInt!
-  boostMultiplierBps: BigInt!
-  lockedUntil: BigInt!
-  creator: String!
-  revenueShareBps: BigInt!
-  platformFeeBps: BigInt!
-  performanceFeeBps: BigInt!
-  positionCount: BigInt!
+  templateId: BigInt!
+  name: String!
+  basePriceUsd: BigInt!
+  version: BigInt!
+}
+
+type OpenCrateFactory_CrateTemplateDisabled {
+  id: ID!
+  templateId: BigInt!
+}
+
+type OpenCrateFactory_CrateTemplateUpdated {
+  id: ID!
+  templateId: BigInt!
+  newVersion: BigInt!
+}
+
+type OpenCrateFactory_EmergencyWithdraw {
+  id: ID!
+  token: String!
+  amount: BigInt!
+  recipient: String!
+}
+
+type OpenCrateFactory_LockupOptionAdded {
+  id: ID!
+  templateId: BigInt!
+  duration: BigInt!
+  multiplierBps: BigInt!
+}
+
+type OpenCrateFactory_LockupOptionRemoved {
+  id: ID!
+  templateId: BigInt!
+  duration: BigInt!
+  multiplierBps: BigInt!
+}
+
+type OpenCrateFactory_LockupOptionUpdated {
+  id: ID!
+  templateId: BigInt!
+  duration: BigInt!
+  multiplierBps: BigInt!
 }
 
 type OpenCrateFactory_OwnershipTransferred {
@@ -100,9 +180,20 @@ type OpenCrateFactory_OwnershipTransferred {
   newOwner: String!
 }
 
-type OpenCrateFactory_StrategyRegistryUpdated {
+type OpenCrateFactory_Paused {
   id: ID!
-  newRegistry: String!
+  account: String!
+}
+
+type OpenCrateFactory_TreasuryUpdated {
+  id: ID!
+  oldTreasury: String!
+  newTreasury: String!
+}
+
+type OpenCrateFactory_Unpaused {
+  id: ID!
+  account: String!
 }
 
 type OpenCrateNFT_Approval {
@@ -147,6 +238,19 @@ type OpenCrateNFT_CrateMinted {
   priceUsd: BigInt!
   boostMultiplierBps: BigInt!
   lockedUntil: BigInt!
+  paymentToken: String!
+  paymentAmount: BigInt!
+}
+
+type OpenCrateNFT_EmergencyModeToggled {
+  id: ID!
+  active: Boolean!
+}
+
+type OpenCrateNFT_EmergencyUnlock {
+  id: ID!
+  tokenId: BigInt!
+  owner: String!
 }
 
 type OpenCrateNFT_FactoryUpdated {
@@ -178,6 +282,11 @@ type OpenCrateNFT_OwnershipTransferred {
   id: ID!
   previousOwner: String!
   newOwner: String!
+}
+
+type OpenCrateNFT_Paused {
+  id: ID!
+  account: String!
 }
 
 type OpenCrateNFT_PositionMetricsUpdated {
@@ -229,11 +338,34 @@ type OpenCrateNFT_RiskDisclosureUpdated {
   riskDisclosure: String!
 }
 
+type OpenCrateNFT_TokenAdded {
+  id: ID!
+  token: String!
+  priceUsd: BigInt!
+  decimals: BigInt!
+}
+
+type OpenCrateNFT_TokenPriceUpdated {
+  id: ID!
+  token: String!
+  priceUsd: BigInt!
+}
+
+type OpenCrateNFT_TokenRemoved {
+  id: ID!
+  token: String!
+}
+
 type OpenCrateNFT_Transfer {
   id: ID!
   from: String!
   to: String!
   tokenId: BigInt!
+}
+
+type OpenCrateNFT_Unpaused {
+  id: ID!
+  account: String!
 }
 
 type OpenCrateStrategyRegistry_OwnershipTransferred {

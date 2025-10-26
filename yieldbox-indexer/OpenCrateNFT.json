@@ -1,1 +1,2590 @@
-[{"inputs":[{"internalType":"string","name":"name_","type":"string"},{"internalType":"string","name":"symbol_","type":"string"},{"internalType":"string","name":"baseURI_","type":"string"},{"internalType":"address","name":"owner_","type":"address"},{"internalType":"address","name":"factory_","type":"address"}],"stateMutability":"nonpayable","type":"constructor"},{"inputs":[{"internalType":"uint256","name":"numerator","type":"uint256"},{"internalType":"uint256","name":"denominator","type":"uint256"}],"name":"ERC2981InvalidDefaultRoyalty","type":"error"},{"inputs":[{"internalType":"address","name":"receiver","type":"address"}],"name":"ERC2981InvalidDefaultRoyaltyReceiver","type":"error"},{"inputs":[{"internalType":"uint256","name":"tokenId","type":"uint256"},{"internalType":"uint256","name":"numerator","type":"uint256"},{"internalType":"uint256","name":"denominator","type":"uint256"}],"name":"ERC2981InvalidTokenRoyalty","type":"error"},{"inputs":[{"internalType":"uint256","name":"tokenId","type":"uint256"},{"internalType":"address","name":"receiver","type":"address"}],"name":"ERC2981InvalidTokenRoyaltyReceiver","type":"error"},{"inputs":[{"internalType":"address","name":"sender","type":"address"},{"internalType":"uint256","name":"tokenId","type":"uint256"},{"internalType":"address","name":"owner","type":"address"}],"name":"ERC721IncorrectOwner","type":"error"},{"inputs":[{"internalType":"address","name":"operator","type":"address"},{"internalType":"uint256","name":"tokenId","type":"uint256"}],"name":"ERC721InsufficientApproval","type":"error"},{"inputs":[{"internalType":"address","name":"approver","type":"address"}],"name":"ERC721InvalidApprover","type":"error"},{"inputs":[{"internalType":"address","name":"operator","type":"address"}],"name":"ERC721InvalidOperator","type":"error"},{"inputs":[{"internalType":"address","name":"owner","type":"address"}],"name":"ERC721InvalidOwner","type":"error"},{"inputs":[{"internalType":"address","name":"receiver","type":"address"}],"name":"ERC721InvalidReceiver","type":"error"},{"inputs":[{"internalType":"address","name":"sender","type":"address"}],"name":"ERC721InvalidSender","type":"error"},{"inputs":[{"internalType":"uint256","name":"tokenId","type":"uint256"}],"name":"ERC721NonexistentToken","type":"error"},{"inputs":[],"name":"InvalidAccount","type":"error"},{"inputs":[],"name":"InvalidBoost","type":"error"},{"inputs":[],"name":"InvalidBps","type":"error"},{"inputs":[],"name":"InvalidFactory","type":"error"},{"inputs":[],"name":"InvalidLockDuration","type":"error"},{"inputs":[],"name":"InvalidPositionTotalAllocation","type":"error"},{"inputs":[],"name":"InvalidPrice","type":"error"},{"inputs":[],"name":"InvalidRecipient","type":"error"},{"inputs":[],"name":"NonexistentToken","type":"error"},{"inputs":[],"name":"NotApprovedOrOwner","type":"error"},{"inputs":[{"internalType":"address","name":"owner","type":"address"}],"name":"OwnableInvalidOwner","type":"error"},{"inputs":[{"internalType":"address","name":"account","type":"address"}],"name":"OwnableUnauthorizedAccount","type":"error"},{"inputs":[{"internalType":"uint64","name":"lockedUntil","type":"uint64"}],"name":"TokenLocked","type":"error"},{"inputs":[],"name":"Unauthorized","type":"error"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"owner","type":"address"},{"indexed":true,"internalType":"address","name":"approved","type":"address"},{"indexed":true,"internalType":"uint256","name":"tokenId","type":"uint256"}],"name":"Approval","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"owner","type":"address"},{"indexed":true,"internalType":"address","name":"operator","type":"address"},{"indexed":false,"internalType":"bool","name":"approved","type":"bool"}],"name":"ApprovalForAll","type":"event"},{"anonymous":false,"inputs":[{"indexed":false,"internalType":"string","name":"baseURI","type":"string"}],"name":"BaseURIUpdated","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"uint256","name":"tokenId","type":"uint256"},{"indexed":false,"internalType":"bool","name":"active","type":"bool"},{"indexed":false,"internalType":"uint16","name":"boostMultiplierBps","type":"uint16"}],"name":"BoostStatusUpdated","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"uint256","name":"tokenId","type":"uint256"},{"indexed":false,"internalType":"uint16","name":"boostMultiplierBps","type":"uint16"}],"name":"BoostUpdated","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"uint256","name":"tokenId","type":"uint256"},{"indexed":true,"internalType":"address","name":"to","type":"address"},{"indexed":false,"internalType":"uint8","name":"riskLevel","type":"uint8"},{"indexed":false,"internalType":"uint256","name":"strategyId","type":"uint256"},{"indexed":false,"internalType":"address","name":"account","type":"address"},{"indexed":false,"internalType":"uint256","name":"priceUsd","type":"uint256"},{"indexed":false,"internalType":"uint16","name":"boostMultiplierBps","type":"uint16"},{"indexed":false,"internalType":"uint64","name":"lockedUntil","type":"uint64"}],"name":"CrateMinted","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"newFactory","type":"address"}],"name":"FactoryUpdated","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"uint256","name":"tokenId","type":"uint256"},{"indexed":false,"internalType":"string","name":"feeDisclosure","type":"string"}],"name":"FeeDisclosureUpdated","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"uint256","name":"tokenId","type":"uint256"},{"indexed":false,"internalType":"uint64","name":"lastRebalanceAt","type":"uint64"},{"indexed":false,"internalType":"uint64","name":"nextHarvestAt","type":"uint64"},{"indexed":false,"internalType":"uint256","name":"accruedYieldUsd","type":"uint256"}],"name":"LifecycleUpdated","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"uint256","name":"tokenId","type":"uint256"},{"indexed":false,"internalType":"uint64","name":"lockedUntil","type":"uint64"}],"name":"LockExtended","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"previousOwner","type":"address"},{"indexed":true,"internalType":"address","name":"newOwner","type":"address"}],"name":"OwnershipTransferred","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"uint256","name":"tokenId","type":"uint256"},{"indexed":true,"internalType":"uint256","name":"positionIndex","type":"uint256"},{"components":[{"internalType":"string","name":"protocol","type":"string"},{"internalType":"string","name":"asset","type":"string"},{"internalType":"string","name":"strategyType","type":"string"},{"internalType":"string","name":"chain","type":"string"},{"internalType":"string","name":"infoURL","type":"string"},{"internalType":"uint16","name":"allocationBps","type":"uint16"},{"internalType":"uint256","name":"allocationUsd","type":"uint256"},{"internalType":"int256","name":"netApyBps","type":"int256"},{"internalType":"int256","name":"baseAprBps","type":"int256"},{"internalType":"int256","name":"incentivesAprBps","type":"int256"},{"internalType":"int256","name":"feeBps","type":"int256"},{"internalType":"uint8","name":"riskScore","type":"uint8"},{"internalType":"uint64","name":"openedAt","type":"uint64"},{"internalType":"uint64","name":"lastRebalancedAt","type":"uint64"},{"internalType":"uint64","name":"nextHarvestAt","type":"uint64"},{"internalType":"uint256","name":"accruedYieldUsd","type":"uint256"}],"indexed":false,"internalType":"struct OpenCrateNFT.PositionDetails","name":"details","type":"tuple"}],"name":"PositionMetricsUpdated","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"uint256","name":"tokenId","type":"uint256"},{"indexed":false,"internalType":"uint256","name":"positionCount","type":"uint256"},{"indexed":true,"internalType":"address","name":"updater","type":"address"}],"name":"PositionsUpdated","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"uint256","name":"tokenId","type":"uint256"},{"indexed":false,"internalType":"uint256","name":"priceUsd","type":"uint256"}],"name":"PriceUpdated","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"uint256","name":"tokenId","type":"uint256"},{"indexed":false,"internalType":"uint16","name":"revenueShareBps","type":"uint16"},{"indexed":false,"internalType":"uint16","name":"platformFeeBps","type":"uint16"},{"indexed":false,"internalType":"uint16","name":"performanceFeeBps","type":"uint16"}],"name":"RevenueShareUpdated","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"uint256","name":"tokenId","type":"uint256"},{"indexed":false,"internalType":"string","name":"riskDisclosure","type":"string"}],"name":"RiskDisclosureUpdated","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"from","type":"address"},{"indexed":true,"internalType":"address","name":"to","type":"address"},{"indexed":true,"internalType":"uint256","name":"tokenId","type":"uint256"}],"name":"Transfer","type":"event"},{"inputs":[],"name":"MAX_BOOST_BPS","outputs":[{"internalType":"uint16","name":"","type":"uint16"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"MAX_BPS","outputs":[{"internalType":"uint16","name":"","type":"uint16"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"MAX_LOCK_DURATION","outputs":[{"internalType":"uint64","name":"","type":"uint64"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"MAX_PRICE_USD","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"MIN_BOOST_BPS","outputs":[{"internalType":"uint16","name":"","type":"uint16"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"MIN_PRICE_USD","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"USD_DECIMALS","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"to","type":"address"},{"internalType":"uint256","name":"tokenId","type":"uint256"}],"name":"approve","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"owner","type":"address"}],"name":"balanceOf","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint256","name":"tokenId","type":"uint256"}],"name":"crateInfo","outputs":[{"components":[{"internalType":"uint8","name":"riskLevel","type":"uint8"},{"internalType":"uint256","name":"strategyId","type":"uint256"},{"internalType":"address","name":"account","type":"address"},{"internalType":"uint64","name":"mintedAt","type":"uint64"},{"internalType":"uint64","name":"lockedUntil","type":"uint64"},{"internalType":"uint16","name":"boostMultiplierBps","type":"uint16"},{"internalType":"uint256","name":"priceUsd","type":"uint256"},{"internalType":"address","name":"creator","type":"address"},{"internalType":"uint16","name":"revenueShareBps","type":"uint16"},{"internalType":"uint16","name":"platformFeeBps","type":"uint16"},{"internalType":"uint16","name":"performanceFeeBps","type":"uint16"},{"internalType":"string","name":"riskDisclosure","type":"string"},{"internalType":"string","name":"feeDisclosure","type":"string"},{"internalType":"uint64","name":"lastRebalanceAt","type":"uint64"},{"internalType":"uint64","name":"nextHarvestAt","type":"uint64"},{"internalType":"uint256","name":"accruedYieldUsd","type":"uint256"},{"internalType":"bool","name":"boostActive","type":"bool"},{"internalType":"uint64","name":"lastBoostAt","type":"uint64"},{"internalType":"uint64","name":"lastLockAt","type":"uint64"}],"internalType":"struct OpenCrateNFT.CrateInfo","name":"","type":"tuple"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"deleteDefaultRoyalty","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"uint256","name":"tokenId","type":"uint256"},{"internalType":"uint64","name":"additionalDuration","type":"uint64"}],"name":"extendLock","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"factory","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint256","name":"tokenId","type":"uint256"}],"name":"getApproved","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint256","name":"tokenId","type":"uint256"}],"name":"getPositions","outputs":[{"components":[{"internalType":"string","name":"protocol","type":"string"},{"internalType":"string","name":"asset","type":"string"},{"internalType":"string","name":"strategyType","type":"string"},{"internalType":"string","name":"chain","type":"string"},{"internalType":"string","name":"infoURL","type":"string"},{"internalType":"uint16","name":"allocationBps","type":"uint16"},{"internalType":"uint256","name":"allocationUsd","type":"uint256"},{"internalType":"int256","name":"netApyBps","type":"int256"},{"internalType":"int256","name":"baseAprBps","type":"int256"},{"internalType":"int256","name":"incentivesAprBps","type":"int256"},{"internalType":"int256","name":"feeBps","type":"int256"},{"internalType":"uint8","name":"riskScore","type":"uint8"},{"internalType":"uint64","name":"openedAt","type":"uint64"},{"internalType":"uint64","name":"lastRebalancedAt","type":"uint64"},{"internalType":"uint64","name":"nextHarvestAt","type":"uint64"},{"internalType":"uint256","name":"accruedYieldUsd","type":"uint256"}],"internalType":"struct OpenCrateNFT.PositionDetails[]","name":"","type":"tuple[]"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"owner","type":"address"},{"internalType":"address","name":"operator","type":"address"}],"name":"isApprovedForAll","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"to","type":"address"},{"internalType":"uint8","name":"riskLevel","type":"uint8"},{"internalType":"uint256","name":"strategyId","type":"uint256"},{"internalType":"address","name":"account","type":"address"},{"internalType":"uint256","name":"priceUsd","type":"uint256"},{"internalType":"uint16","name":"boostMultiplierBps","type":"uint16"},{"internalType":"uint64","name":"lockDuration","type":"uint64"},{"internalType":"address","name":"creator","type":"address"},{"internalType":"uint16","name":"revenueShareBps","type":"uint16"},{"internalType":"uint16","name":"platformFeeBps","type":"uint16"},{"internalType":"uint16","name":"performanceFeeBps","type":"uint16"},{"internalType":"string","name":"riskDisclosure","type":"string"},{"internalType":"string","name":"feeDisclosure","type":"string"},{"internalType":"uint64","name":"lastRebalanceAt","type":"uint64"},{"internalType":"uint64","name":"nextHarvestAt","type":"uint64"},{"internalType":"uint256","name":"accruedYieldUsd","type":"uint256"},{"internalType":"bool","name":"boostActive","type":"bool"},{"components":[{"internalType":"string","name":"protocol","type":"string"},{"internalType":"string","name":"asset","type":"string"},{"internalType":"string","name":"strategyType","type":"string"},{"internalType":"string","name":"chain","type":"string"},{"internalType":"string","name":"infoURL","type":"string"},{"internalType":"uint16","name":"allocationBps","type":"uint16"},{"internalType":"uint256","name":"allocationUsd","type":"uint256"},{"internalType":"int256","name":"netApyBps","type":"int256"},{"internalType":"int256","name":"baseAprBps","type":"int256"},{"internalType":"int256","name":"incentivesAprBps","type":"int256"},{"internalType":"int256","name":"feeBps","type":"int256"},{"internalType":"uint8","name":"riskScore","type":"uint8"},{"internalType":"uint64","name":"openedAt","type":"uint64"},{"internalType":"uint64","name":"lastRebalancedAt","type":"uint64"},{"internalType":"uint64","name":"nextHarvestAt","type":"uint64"},{"internalType":"uint256","name":"accruedYieldUsd","type":"uint256"}],"internalType":"struct OpenCrateNFT.PositionPayload[]","name":"positions","type":"tuple[]"}],"name":"mintCrate","outputs":[{"internalType":"uint256","name":"tokenId","type":"uint256"}],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"name","outputs":[{"internalType":"string","name":"","type":"string"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"nextTokenId","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"owner","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint256","name":"tokenId","type":"uint256"}],"name":"ownerOf","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint256","name":"tokenId","type":"uint256"}],"name":"positionsCount","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"renounceOwnership","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"uint256","name":"tokenId","type":"uint256"},{"internalType":"uint256","name":"salePrice","type":"uint256"}],"name":"royaltyInfo","outputs":[{"internalType":"address","name":"receiver","type":"address"},{"internalType":"uint256","name":"amount","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"from","type":"address"},{"internalType":"address","name":"to","type":"address"},{"internalType":"uint256","name":"tokenId","type":"uint256"}],"name":"safeTransferFrom","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"from","type":"address"},{"internalType":"address","name":"to","type":"address"},{"internalType":"uint256","name":"tokenId","type":"uint256"},{"internalType":"bytes","name":"data","type":"bytes"}],"name":"safeTransferFrom","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"operator","type":"address"},{"internalType":"bool","name":"approved","type":"bool"}],"name":"setApprovalForAll","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"string","name":"baseURI_","type":"string"}],"name":"setBaseURI","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"uint256","name":"tokenId","type":"uint256"},{"internalType":"uint16","name":"newBoostMultiplierBps","type":"uint16"}],"name":"setBoostMultiplier","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"uint256","name":"tokenId","type":"uint256"},{"internalType":"bool","name":"active","type":"bool"},{"internalType":"uint16","name":"newBoostMultiplierBps","type":"uint16"}],"name":"setBoostStatus","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"receiver","type":"address"},{"internalType":"uint96","name":"feeNumerator","type":"uint96"}],"name":"setDefaultRoyalty","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"newFactory","type":"address"}],"name":"setFactory","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"bytes4","name":"interfaceId","type":"bytes4"}],"name":"supportsInterface","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"symbol","outputs":[{"internalType":"string","name":"","type":"string"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint256","name":"tokenId","type":"uint256"}],"name":"tokenURI","outputs":[{"internalType":"string","name":"","type":"string"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"totalMinted","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"from","type":"address"},{"internalType":"address","name":"to","type":"address"},{"internalType":"uint256","name":"tokenId","type":"uint256"}],"name":"transferFrom","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"newOwner","type":"address"}],"name":"transferOwnership","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"uint256","name":"tokenId","type":"uint256"},{"internalType":"string","name":"riskDisclosure","type":"string"},{"internalType":"string","name":"feeDisclosure","type":"string"}],"name":"updateDisclosures","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"uint256","name":"tokenId","type":"uint256"},{"internalType":"uint64","name":"lastRebalanceAt","type":"uint64"},{"internalType":"uint64","name":"nextHarvestAt","type":"uint64"},{"internalType":"uint256","name":"accruedYieldUsd","type":"uint256"}],"name":"updateLifecycle","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"uint256","name":"tokenId","type":"uint256"},{"components":[{"internalType":"string","name":"protocol","type":"string"},{"internalType":"string","name":"asset","type":"string"},{"internalType":"string","name":"strategyType","type":"string"},{"internalType":"string","name":"chain","type":"string"},{"internalType":"string","name":"infoURL","type":"string"},{"internalType":"uint16","name":"allocationBps","type":"uint16"},{"internalType":"uint256","name":"allocationUsd","type":"uint256"},{"internalType":"int256","name":"netApyBps","type":"int256"},{"internalType":"int256","name":"baseAprBps","type":"int256"},{"internalType":"int256","name":"incentivesAprBps","type":"int256"},{"internalType":"int256","name":"feeBps","type":"int256"},{"internalType":"uint8","name":"riskScore","type":"uint8"},{"internalType":"uint64","name":"openedAt","type":"uint64"},{"internalType":"uint64","name":"lastRebalancedAt","type":"uint64"},{"internalType":"uint64","name":"nextHarvestAt","type":"uint64"},{"internalType":"uint256","name":"accruedYieldUsd","type":"uint256"}],"internalType":"struct OpenCrateNFT.PositionPayload[]","name":"positions","type":"tuple[]"}],"name":"updatePositions","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"uint256","name":"tokenId","type":"uint256"},{"internalType":"uint256","name":"newPriceUsd","type":"uint256"}],"name":"updatePrice","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"uint256","name":"tokenId","type":"uint256"},{"internalType":"uint16","name":"revenueShareBps","type":"uint16"},{"internalType":"uint16","name":"platformFeeBps","type":"uint16"},{"internalType":"uint16","name":"performanceFeeBps","type":"uint16"}],"name":"updateRevenueShare","outputs":[],"stateMutability":"nonpayable","type":"function"}]
+[
+    {
+        "inputs": [
+            {
+                "internalType": "string",
+                "name": "name_",
+                "type": "string"
+            },
+            {
+                "internalType": "string",
+                "name": "symbol_",
+                "type": "string"
+            },
+            {
+                "internalType": "string",
+                "name": "baseURI_",
+                "type": "string"
+            },
+            {
+                "internalType": "address",
+                "name": "owner_",
+                "type": "address"
+            },
+            {
+                "internalType": "address",
+                "name": "factory_",
+                "type": "address"
+            }
+        ],
+        "stateMutability": "nonpayable",
+        "type": "constructor"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "uint256",
+                "name": "numerator",
+                "type": "uint256"
+            },
+            {
+                "internalType": "uint256",
+                "name": "denominator",
+                "type": "uint256"
+            }
+        ],
+        "name": "ERC2981InvalidDefaultRoyalty",
+        "type": "error"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "address",
+                "name": "receiver",
+                "type": "address"
+            }
+        ],
+        "name": "ERC2981InvalidDefaultRoyaltyReceiver",
+        "type": "error"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "uint256",
+                "name": "tokenId",
+                "type": "uint256"
+            },
+            {
+                "internalType": "uint256",
+                "name": "numerator",
+                "type": "uint256"
+            },
+            {
+                "internalType": "uint256",
+                "name": "denominator",
+                "type": "uint256"
+            }
+        ],
+        "name": "ERC2981InvalidTokenRoyalty",
+        "type": "error"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "uint256",
+                "name": "tokenId",
+                "type": "uint256"
+            },
+            {
+                "internalType": "address",
+                "name": "receiver",
+                "type": "address"
+            }
+        ],
+        "name": "ERC2981InvalidTokenRoyaltyReceiver",
+        "type": "error"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "address",
+                "name": "sender",
+                "type": "address"
+            },
+            {
+                "internalType": "uint256",
+                "name": "tokenId",
+                "type": "uint256"
+            },
+            {
+                "internalType": "address",
+                "name": "owner",
+                "type": "address"
+            }
+        ],
+        "name": "ERC721IncorrectOwner",
+        "type": "error"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "address",
+                "name": "operator",
+                "type": "address"
+            },
+            {
+                "internalType": "uint256",
+                "name": "tokenId",
+                "type": "uint256"
+            }
+        ],
+        "name": "ERC721InsufficientApproval",
+        "type": "error"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "address",
+                "name": "approver",
+                "type": "address"
+            }
+        ],
+        "name": "ERC721InvalidApprover",
+        "type": "error"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "address",
+                "name": "operator",
+                "type": "address"
+            }
+        ],
+        "name": "ERC721InvalidOperator",
+        "type": "error"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "address",
+                "name": "owner",
+                "type": "address"
+            }
+        ],
+        "name": "ERC721InvalidOwner",
+        "type": "error"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "address",
+                "name": "receiver",
+                "type": "address"
+            }
+        ],
+        "name": "ERC721InvalidReceiver",
+        "type": "error"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "address",
+                "name": "sender",
+                "type": "address"
+            }
+        ],
+        "name": "ERC721InvalidSender",
+        "type": "error"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "uint256",
+                "name": "tokenId",
+                "type": "uint256"
+            }
+        ],
+        "name": "ERC721NonexistentToken",
+        "type": "error"
+    },
+    {
+        "inputs": [],
+        "name": "EmergencyModeActive",
+        "type": "error"
+    },
+    {
+        "inputs": [],
+        "name": "EnforcedPause",
+        "type": "error"
+    },
+    {
+        "inputs": [],
+        "name": "ExpectedPause",
+        "type": "error"
+    },
+    {
+        "inputs": [],
+        "name": "InsufficientTokenPayment",
+        "type": "error"
+    },
+    {
+        "inputs": [],
+        "name": "InvalidAccount",
+        "type": "error"
+    },
+    {
+        "inputs": [],
+        "name": "InvalidBoost",
+        "type": "error"
+    },
+    {
+        "inputs": [],
+        "name": "InvalidBps",
+        "type": "error"
+    },
+    {
+        "inputs": [],
+        "name": "InvalidFactory",
+        "type": "error"
+    },
+    {
+        "inputs": [],
+        "name": "InvalidLockDuration",
+        "type": "error"
+    },
+    {
+        "inputs": [],
+        "name": "InvalidPositionTotalAllocation",
+        "type": "error"
+    },
+    {
+        "inputs": [],
+        "name": "InvalidPrice",
+        "type": "error"
+    },
+    {
+        "inputs": [],
+        "name": "InvalidRecipient",
+        "type": "error"
+    },
+    {
+        "inputs": [],
+        "name": "InvalidTokenAddress",
+        "type": "error"
+    },
+    {
+        "inputs": [],
+        "name": "InvalidTokenAmount",
+        "type": "error"
+    },
+    {
+        "inputs": [],
+        "name": "InvalidTokenPrice",
+        "type": "error"
+    },
+    {
+        "inputs": [],
+        "name": "NonexistentToken",
+        "type": "error"
+    },
+    {
+        "inputs": [],
+        "name": "NotApprovedOrOwner",
+        "type": "error"
+    },
+    {
+        "inputs": [],
+        "name": "NotInEmergencyMode",
+        "type": "error"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "address",
+                "name": "owner",
+                "type": "address"
+            }
+        ],
+        "name": "OwnableInvalidOwner",
+        "type": "error"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "address",
+                "name": "account",
+                "type": "address"
+            }
+        ],
+        "name": "OwnableUnauthorizedAccount",
+        "type": "error"
+    },
+    {
+        "inputs": [],
+        "name": "ReentrancyGuardReentrantCall",
+        "type": "error"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "uint64",
+                "name": "lockedUntil",
+                "type": "uint64"
+            }
+        ],
+        "name": "TokenLocked",
+        "type": "error"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "address",
+                "name": "token",
+                "type": "address"
+            }
+        ],
+        "name": "TokenNotSupported",
+        "type": "error"
+    },
+    {
+        "inputs": [],
+        "name": "Unauthorized",
+        "type": "error"
+    },
+    {
+        "anonymous": false,
+        "inputs": [
+            {
+                "indexed": true,
+                "internalType": "address",
+                "name": "owner",
+                "type": "address"
+            },
+            {
+                "indexed": true,
+                "internalType": "address",
+                "name": "approved",
+                "type": "address"
+            },
+            {
+                "indexed": true,
+                "internalType": "uint256",
+                "name": "tokenId",
+                "type": "uint256"
+            }
+        ],
+        "name": "Approval",
+        "type": "event"
+    },
+    {
+        "anonymous": false,
+        "inputs": [
+            {
+                "indexed": true,
+                "internalType": "address",
+                "name": "owner",
+                "type": "address"
+            },
+            {
+                "indexed": true,
+                "internalType": "address",
+                "name": "operator",
+                "type": "address"
+            },
+            {
+                "indexed": false,
+                "internalType": "bool",
+                "name": "approved",
+                "type": "bool"
+            }
+        ],
+        "name": "ApprovalForAll",
+        "type": "event"
+    },
+    {
+        "anonymous": false,
+        "inputs": [
+            {
+                "indexed": false,
+                "internalType": "string",
+                "name": "baseURI",
+                "type": "string"
+            }
+        ],
+        "name": "BaseURIUpdated",
+        "type": "event"
+    },
+    {
+        "anonymous": false,
+        "inputs": [
+            {
+                "indexed": true,
+                "internalType": "uint256",
+                "name": "tokenId",
+                "type": "uint256"
+            },
+            {
+                "indexed": false,
+                "internalType": "bool",
+                "name": "active",
+                "type": "bool"
+            },
+            {
+                "indexed": false,
+                "internalType": "uint16",
+                "name": "boostMultiplierBps",
+                "type": "uint16"
+            }
+        ],
+        "name": "BoostStatusUpdated",
+        "type": "event"
+    },
+    {
+        "anonymous": false,
+        "inputs": [
+            {
+                "indexed": true,
+                "internalType": "uint256",
+                "name": "tokenId",
+                "type": "uint256"
+            },
+            {
+                "indexed": false,
+                "internalType": "uint16",
+                "name": "boostMultiplierBps",
+                "type": "uint16"
+            }
+        ],
+        "name": "BoostUpdated",
+        "type": "event"
+    },
+    {
+        "anonymous": false,
+        "inputs": [
+            {
+                "indexed": true,
+                "internalType": "uint256",
+                "name": "tokenId",
+                "type": "uint256"
+            },
+            {
+                "indexed": true,
+                "internalType": "address",
+                "name": "to",
+                "type": "address"
+            },
+            {
+                "indexed": false,
+                "internalType": "uint8",
+                "name": "riskLevel",
+                "type": "uint8"
+            },
+            {
+                "indexed": false,
+                "internalType": "uint256",
+                "name": "strategyId",
+                "type": "uint256"
+            },
+            {
+                "indexed": false,
+                "internalType": "address",
+                "name": "account",
+                "type": "address"
+            },
+            {
+                "indexed": false,
+                "internalType": "uint256",
+                "name": "priceUsd",
+                "type": "uint256"
+            },
+            {
+                "indexed": false,
+                "internalType": "uint16",
+                "name": "boostMultiplierBps",
+                "type": "uint16"
+            },
+            {
+                "indexed": false,
+                "internalType": "uint64",
+                "name": "lockedUntil",
+                "type": "uint64"
+            },
+            {
+                "indexed": true,
+                "internalType": "address",
+                "name": "paymentToken",
+                "type": "address"
+            },
+            {
+                "indexed": false,
+                "internalType": "uint256",
+                "name": "paymentAmount",
+                "type": "uint256"
+            }
+        ],
+        "name": "CrateMinted",
+        "type": "event"
+    },
+    {
+        "anonymous": false,
+        "inputs": [
+            {
+                "indexed": false,
+                "internalType": "bool",
+                "name": "active",
+                "type": "bool"
+            }
+        ],
+        "name": "EmergencyModeToggled",
+        "type": "event"
+    },
+    {
+        "anonymous": false,
+        "inputs": [
+            {
+                "indexed": true,
+                "internalType": "uint256",
+                "name": "tokenId",
+                "type": "uint256"
+            },
+            {
+                "indexed": true,
+                "internalType": "address",
+                "name": "owner",
+                "type": "address"
+            }
+        ],
+        "name": "EmergencyUnlock",
+        "type": "event"
+    },
+    {
+        "anonymous": false,
+        "inputs": [
+            {
+                "indexed": true,
+                "internalType": "address",
+                "name": "newFactory",
+                "type": "address"
+            }
+        ],
+        "name": "FactoryUpdated",
+        "type": "event"
+    },
+    {
+        "anonymous": false,
+        "inputs": [
+            {
+                "indexed": true,
+                "internalType": "uint256",
+                "name": "tokenId",
+                "type": "uint256"
+            },
+            {
+                "indexed": false,
+                "internalType": "string",
+                "name": "feeDisclosure",
+                "type": "string"
+            }
+        ],
+        "name": "FeeDisclosureUpdated",
+        "type": "event"
+    },
+    {
+        "anonymous": false,
+        "inputs": [
+            {
+                "indexed": true,
+                "internalType": "uint256",
+                "name": "tokenId",
+                "type": "uint256"
+            },
+            {
+                "indexed": false,
+                "internalType": "uint64",
+                "name": "lastRebalanceAt",
+                "type": "uint64"
+            },
+            {
+                "indexed": false,
+                "internalType": "uint64",
+                "name": "nextHarvestAt",
+                "type": "uint64"
+            },
+            {
+                "indexed": false,
+                "internalType": "uint256",
+                "name": "accruedYieldUsd",
+                "type": "uint256"
+            }
+        ],
+        "name": "LifecycleUpdated",
+        "type": "event"
+    },
+    {
+        "anonymous": false,
+        "inputs": [
+            {
+                "indexed": true,
+                "internalType": "uint256",
+                "name": "tokenId",
+                "type": "uint256"
+            },
+            {
+                "indexed": false,
+                "internalType": "uint64",
+                "name": "lockedUntil",
+                "type": "uint64"
+            }
+        ],
+        "name": "LockExtended",
+        "type": "event"
+    },
+    {
+        "anonymous": false,
+        "inputs": [
+            {
+                "indexed": true,
+                "internalType": "address",
+                "name": "previousOwner",
+                "type": "address"
+            },
+            {
+                "indexed": true,
+                "internalType": "address",
+                "name": "newOwner",
+                "type": "address"
+            }
+        ],
+        "name": "OwnershipTransferred",
+        "type": "event"
+    },
+    {
+        "anonymous": false,
+        "inputs": [
+            {
+                "indexed": false,
+                "internalType": "address",
+                "name": "account",
+                "type": "address"
+            }
+        ],
+        "name": "Paused",
+        "type": "event"
+    },
+    {
+        "anonymous": false,
+        "inputs": [
+            {
+                "indexed": true,
+                "internalType": "uint256",
+                "name": "tokenId",
+                "type": "uint256"
+            },
+            {
+                "indexed": true,
+                "internalType": "uint256",
+                "name": "positionIndex",
+                "type": "uint256"
+            },
+            {
+                "components": [
+                    {
+                        "internalType": "string",
+                        "name": "protocol",
+                        "type": "string"
+                    },
+                    {
+                        "internalType": "string",
+                        "name": "asset",
+                        "type": "string"
+                    },
+                    {
+                        "internalType": "string",
+                        "name": "strategyType",
+                        "type": "string"
+                    },
+                    {
+                        "internalType": "string",
+                        "name": "chain",
+                        "type": "string"
+                    },
+                    {
+                        "internalType": "string",
+                        "name": "infoURL",
+                        "type": "string"
+                    },
+                    {
+                        "internalType": "uint16",
+                        "name": "allocationBps",
+                        "type": "uint16"
+                    },
+                    {
+                        "internalType": "uint256",
+                        "name": "allocationUsd",
+                        "type": "uint256"
+                    },
+                    {
+                        "internalType": "int256",
+                        "name": "netApyBps",
+                        "type": "int256"
+                    },
+                    {
+                        "internalType": "int256",
+                        "name": "baseAprBps",
+                        "type": "int256"
+                    },
+                    {
+                        "internalType": "int256",
+                        "name": "incentivesAprBps",
+                        "type": "int256"
+                    },
+                    {
+                        "internalType": "int256",
+                        "name": "feeBps",
+                        "type": "int256"
+                    },
+                    {
+                        "internalType": "uint8",
+                        "name": "riskScore",
+                        "type": "uint8"
+                    },
+                    {
+                        "internalType": "uint64",
+                        "name": "openedAt",
+                        "type": "uint64"
+                    },
+                    {
+                        "internalType": "uint64",
+                        "name": "lastRebalancedAt",
+                        "type": "uint64"
+                    },
+                    {
+                        "internalType": "uint64",
+                        "name": "nextHarvestAt",
+                        "type": "uint64"
+                    },
+                    {
+                        "internalType": "uint256",
+                        "name": "accruedYieldUsd",
+                        "type": "uint256"
+                    }
+                ],
+                "indexed": false,
+                "internalType": "struct OpenCrateNFT.PositionDetails",
+                "name": "details",
+                "type": "tuple"
+            }
+        ],
+        "name": "PositionMetricsUpdated",
+        "type": "event"
+    },
+    {
+        "anonymous": false,
+        "inputs": [
+            {
+                "indexed": true,
+                "internalType": "uint256",
+                "name": "tokenId",
+                "type": "uint256"
+            },
+            {
+                "indexed": false,
+                "internalType": "uint256",
+                "name": "positionCount",
+                "type": "uint256"
+            },
+            {
+                "indexed": true,
+                "internalType": "address",
+                "name": "updater",
+                "type": "address"
+            }
+        ],
+        "name": "PositionsUpdated",
+        "type": "event"
+    },
+    {
+        "anonymous": false,
+        "inputs": [
+            {
+                "indexed": true,
+                "internalType": "uint256",
+                "name": "tokenId",
+                "type": "uint256"
+            },
+            {
+                "indexed": false,
+                "internalType": "uint256",
+                "name": "priceUsd",
+                "type": "uint256"
+            }
+        ],
+        "name": "PriceUpdated",
+        "type": "event"
+    },
+    {
+        "anonymous": false,
+        "inputs": [
+            {
+                "indexed": true,
+                "internalType": "uint256",
+                "name": "tokenId",
+                "type": "uint256"
+            },
+            {
+                "indexed": false,
+                "internalType": "uint16",
+                "name": "revenueShareBps",
+                "type": "uint16"
+            },
+            {
+                "indexed": false,
+                "internalType": "uint16",
+                "name": "platformFeeBps",
+                "type": "uint16"
+            },
+            {
+                "indexed": false,
+                "internalType": "uint16",
+                "name": "performanceFeeBps",
+                "type": "uint16"
+            }
+        ],
+        "name": "RevenueShareUpdated",
+        "type": "event"
+    },
+    {
+        "anonymous": false,
+        "inputs": [
+            {
+                "indexed": true,
+                "internalType": "uint256",
+                "name": "tokenId",
+                "type": "uint256"
+            },
+            {
+                "indexed": false,
+                "internalType": "string",
+                "name": "riskDisclosure",
+                "type": "string"
+            }
+        ],
+        "name": "RiskDisclosureUpdated",
+        "type": "event"
+    },
+    {
+        "anonymous": false,
+        "inputs": [
+            {
+                "indexed": true,
+                "internalType": "address",
+                "name": "token",
+                "type": "address"
+            },
+            {
+                "indexed": false,
+                "internalType": "uint256",
+                "name": "priceUsd",
+                "type": "uint256"
+            },
+            {
+                "indexed": false,
+                "internalType": "uint8",
+                "name": "decimals",
+                "type": "uint8"
+            }
+        ],
+        "name": "TokenAdded",
+        "type": "event"
+    },
+    {
+        "anonymous": false,
+        "inputs": [
+            {
+                "indexed": true,
+                "internalType": "address",
+                "name": "token",
+                "type": "address"
+            },
+            {
+                "indexed": false,
+                "internalType": "uint256",
+                "name": "priceUsd",
+                "type": "uint256"
+            }
+        ],
+        "name": "TokenPriceUpdated",
+        "type": "event"
+    },
+    {
+        "anonymous": false,
+        "inputs": [
+            {
+                "indexed": true,
+                "internalType": "address",
+                "name": "token",
+                "type": "address"
+            }
+        ],
+        "name": "TokenRemoved",
+        "type": "event"
+    },
+    {
+        "anonymous": false,
+        "inputs": [
+            {
+                "indexed": true,
+                "internalType": "address",
+                "name": "from",
+                "type": "address"
+            },
+            {
+                "indexed": true,
+                "internalType": "address",
+                "name": "to",
+                "type": "address"
+            },
+            {
+                "indexed": true,
+                "internalType": "uint256",
+                "name": "tokenId",
+                "type": "uint256"
+            }
+        ],
+        "name": "Transfer",
+        "type": "event"
+    },
+    {
+        "anonymous": false,
+        "inputs": [
+            {
+                "indexed": false,
+                "internalType": "address",
+                "name": "account",
+                "type": "address"
+            }
+        ],
+        "name": "Unpaused",
+        "type": "event"
+    },
+    {
+        "inputs": [],
+        "name": "MAX_BOOST_BPS",
+        "outputs": [
+            {
+                "internalType": "uint16",
+                "name": "",
+                "type": "uint16"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "MAX_BPS",
+        "outputs": [
+            {
+                "internalType": "uint16",
+                "name": "",
+                "type": "uint16"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "MAX_LOCK_DURATION",
+        "outputs": [
+            {
+                "internalType": "uint64",
+                "name": "",
+                "type": "uint64"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "MAX_PRICE_USD",
+        "outputs": [
+            {
+                "internalType": "uint256",
+                "name": "",
+                "type": "uint256"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "MIN_BOOST_BPS",
+        "outputs": [
+            {
+                "internalType": "uint16",
+                "name": "",
+                "type": "uint16"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "MIN_PRICE_USD",
+        "outputs": [
+            {
+                "internalType": "uint256",
+                "name": "",
+                "type": "uint256"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "USD_DECIMALS",
+        "outputs": [
+            {
+                "internalType": "uint256",
+                "name": "",
+                "type": "uint256"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "address",
+                "name": "token",
+                "type": "address"
+            },
+            {
+                "internalType": "uint256",
+                "name": "priceUsd",
+                "type": "uint256"
+            },
+            {
+                "internalType": "uint8",
+                "name": "decimals",
+                "type": "uint8"
+            }
+        ],
+        "name": "addSupportedToken",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "address",
+                "name": "to",
+                "type": "address"
+            },
+            {
+                "internalType": "uint256",
+                "name": "tokenId",
+                "type": "uint256"
+            }
+        ],
+        "name": "approve",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "address",
+                "name": "owner",
+                "type": "address"
+            }
+        ],
+        "name": "balanceOf",
+        "outputs": [
+            {
+                "internalType": "uint256",
+                "name": "",
+                "type": "uint256"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "address",
+                "name": "paymentToken",
+                "type": "address"
+            },
+            {
+                "internalType": "uint256",
+                "name": "paymentAmount",
+                "type": "uint256"
+            },
+            {
+                "components": [
+                    {
+                        "internalType": "address",
+                        "name": "to",
+                        "type": "address"
+                    },
+                    {
+                        "internalType": "uint8",
+                        "name": "riskLevel",
+                        "type": "uint8"
+                    },
+                    {
+                        "internalType": "uint256",
+                        "name": "strategyId",
+                        "type": "uint256"
+                    },
+                    {
+                        "internalType": "address",
+                        "name": "account",
+                        "type": "address"
+                    },
+                    {
+                        "internalType": "uint256",
+                        "name": "priceUsd",
+                        "type": "uint256"
+                    },
+                    {
+                        "internalType": "uint16",
+                        "name": "boostMultiplierBps",
+                        "type": "uint16"
+                    },
+                    {
+                        "internalType": "uint64",
+                        "name": "lockDuration",
+                        "type": "uint64"
+                    },
+                    {
+                        "internalType": "address",
+                        "name": "creator",
+                        "type": "address"
+                    },
+                    {
+                        "internalType": "uint16",
+                        "name": "revenueShareBps",
+                        "type": "uint16"
+                    },
+                    {
+                        "internalType": "uint16",
+                        "name": "platformFeeBps",
+                        "type": "uint16"
+                    },
+                    {
+                        "internalType": "uint16",
+                        "name": "performanceFeeBps",
+                        "type": "uint16"
+                    },
+                    {
+                        "internalType": "string",
+                        "name": "riskDisclosure",
+                        "type": "string"
+                    },
+                    {
+                        "internalType": "string",
+                        "name": "feeDisclosure",
+                        "type": "string"
+                    },
+                    {
+                        "internalType": "uint64",
+                        "name": "lastRebalanceAt",
+                        "type": "uint64"
+                    },
+                    {
+                        "internalType": "uint64",
+                        "name": "nextHarvestAt",
+                        "type": "uint64"
+                    },
+                    {
+                        "internalType": "uint256",
+                        "name": "accruedYieldUsd",
+                        "type": "uint256"
+                    },
+                    {
+                        "internalType": "bool",
+                        "name": "boostActive",
+                        "type": "bool"
+                    },
+                    {
+                        "components": [
+                            {
+                                "internalType": "string",
+                                "name": "protocol",
+                                "type": "string"
+                            },
+                            {
+                                "internalType": "string",
+                                "name": "asset",
+                                "type": "string"
+                            },
+                            {
+                                "internalType": "string",
+                                "name": "strategyType",
+                                "type": "string"
+                            },
+                            {
+                                "internalType": "string",
+                                "name": "chain",
+                                "type": "string"
+                            },
+                            {
+                                "internalType": "string",
+                                "name": "infoURL",
+                                "type": "string"
+                            },
+                            {
+                                "internalType": "uint16",
+                                "name": "allocationBps",
+                                "type": "uint16"
+                            },
+                            {
+                                "internalType": "uint256",
+                                "name": "allocationUsd",
+                                "type": "uint256"
+                            },
+                            {
+                                "internalType": "int256",
+                                "name": "netApyBps",
+                                "type": "int256"
+                            },
+                            {
+                                "internalType": "int256",
+                                "name": "baseAprBps",
+                                "type": "int256"
+                            },
+                            {
+                                "internalType": "int256",
+                                "name": "incentivesAprBps",
+                                "type": "int256"
+                            },
+                            {
+                                "internalType": "int256",
+                                "name": "feeBps",
+                                "type": "int256"
+                            },
+                            {
+                                "internalType": "uint8",
+                                "name": "riskScore",
+                                "type": "uint8"
+                            },
+                            {
+                                "internalType": "uint64",
+                                "name": "openedAt",
+                                "type": "uint64"
+                            },
+                            {
+                                "internalType": "uint64",
+                                "name": "lastRebalancedAt",
+                                "type": "uint64"
+                            },
+                            {
+                                "internalType": "uint64",
+                                "name": "nextHarvestAt",
+                                "type": "uint64"
+                            },
+                            {
+                                "internalType": "uint256",
+                                "name": "accruedYieldUsd",
+                                "type": "uint256"
+                            }
+                        ],
+                        "internalType": "struct OpenCrateNFT.PositionPayload[]",
+                        "name": "positions",
+                        "type": "tuple[]"
+                    }
+                ],
+                "internalType": "struct OpenCrateNFT.MintParams",
+                "name": "params",
+                "type": "tuple"
+            }
+        ],
+        "name": "buyCrate",
+        "outputs": [
+            {
+                "internalType": "uint256",
+                "name": "tokenId",
+                "type": "uint256"
+            }
+        ],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "uint256",
+                "name": "tokenId",
+                "type": "uint256"
+            }
+        ],
+        "name": "crateInfo",
+        "outputs": [
+            {
+                "components": [
+                    {
+                        "internalType": "uint8",
+                        "name": "riskLevel",
+                        "type": "uint8"
+                    },
+                    {
+                        "internalType": "uint256",
+                        "name": "strategyId",
+                        "type": "uint256"
+                    },
+                    {
+                        "internalType": "address",
+                        "name": "account",
+                        "type": "address"
+                    },
+                    {
+                        "internalType": "uint64",
+                        "name": "mintedAt",
+                        "type": "uint64"
+                    },
+                    {
+                        "internalType": "uint64",
+                        "name": "lockedUntil",
+                        "type": "uint64"
+                    },
+                    {
+                        "internalType": "uint16",
+                        "name": "boostMultiplierBps",
+                        "type": "uint16"
+                    },
+                    {
+                        "internalType": "uint256",
+                        "name": "priceUsd",
+                        "type": "uint256"
+                    },
+                    {
+                        "internalType": "address",
+                        "name": "creator",
+                        "type": "address"
+                    },
+                    {
+                        "internalType": "uint16",
+                        "name": "revenueShareBps",
+                        "type": "uint16"
+                    },
+                    {
+                        "internalType": "uint16",
+                        "name": "platformFeeBps",
+                        "type": "uint16"
+                    },
+                    {
+                        "internalType": "uint16",
+                        "name": "performanceFeeBps",
+                        "type": "uint16"
+                    },
+                    {
+                        "internalType": "string",
+                        "name": "riskDisclosure",
+                        "type": "string"
+                    },
+                    {
+                        "internalType": "string",
+                        "name": "feeDisclosure",
+                        "type": "string"
+                    },
+                    {
+                        "internalType": "uint64",
+                        "name": "lastRebalanceAt",
+                        "type": "uint64"
+                    },
+                    {
+                        "internalType": "uint64",
+                        "name": "nextHarvestAt",
+                        "type": "uint64"
+                    },
+                    {
+                        "internalType": "uint256",
+                        "name": "accruedYieldUsd",
+                        "type": "uint256"
+                    },
+                    {
+                        "internalType": "bool",
+                        "name": "boostActive",
+                        "type": "bool"
+                    },
+                    {
+                        "internalType": "uint64",
+                        "name": "lastBoostAt",
+                        "type": "uint64"
+                    },
+                    {
+                        "internalType": "uint64",
+                        "name": "lastLockAt",
+                        "type": "uint64"
+                    },
+                    {
+                        "internalType": "address",
+                        "name": "paymentToken",
+                        "type": "address"
+                    },
+                    {
+                        "internalType": "uint256",
+                        "name": "paymentAmount",
+                        "type": "uint256"
+                    }
+                ],
+                "internalType": "struct OpenCrateNFT.CrateInfo",
+                "name": "",
+                "type": "tuple"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "deleteDefaultRoyalty",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "emergencyMode",
+        "outputs": [
+            {
+                "internalType": "bool",
+                "name": "",
+                "type": "bool"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "uint256",
+                "name": "tokenId",
+                "type": "uint256"
+            }
+        ],
+        "name": "emergencyUnlock",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "uint256",
+                "name": "tokenId",
+                "type": "uint256"
+            },
+            {
+                "internalType": "uint64",
+                "name": "additionalDuration",
+                "type": "uint64"
+            }
+        ],
+        "name": "extendLock",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "factory",
+        "outputs": [
+            {
+                "internalType": "address",
+                "name": "",
+                "type": "address"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "uint256",
+                "name": "tokenId",
+                "type": "uint256"
+            }
+        ],
+        "name": "getApproved",
+        "outputs": [
+            {
+                "internalType": "address",
+                "name": "",
+                "type": "address"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "uint256",
+                "name": "tokenId",
+                "type": "uint256"
+            }
+        ],
+        "name": "getPositions",
+        "outputs": [
+            {
+                "components": [
+                    {
+                        "internalType": "string",
+                        "name": "protocol",
+                        "type": "string"
+                    },
+                    {
+                        "internalType": "string",
+                        "name": "asset",
+                        "type": "string"
+                    },
+                    {
+                        "internalType": "string",
+                        "name": "strategyType",
+                        "type": "string"
+                    },
+                    {
+                        "internalType": "string",
+                        "name": "chain",
+                        "type": "string"
+                    },
+                    {
+                        "internalType": "string",
+                        "name": "infoURL",
+                        "type": "string"
+                    },
+                    {
+                        "internalType": "uint16",
+                        "name": "allocationBps",
+                        "type": "uint16"
+                    },
+                    {
+                        "internalType": "uint256",
+                        "name": "allocationUsd",
+                        "type": "uint256"
+                    },
+                    {
+                        "internalType": "int256",
+                        "name": "netApyBps",
+                        "type": "int256"
+                    },
+                    {
+                        "internalType": "int256",
+                        "name": "baseAprBps",
+                        "type": "int256"
+                    },
+                    {
+                        "internalType": "int256",
+                        "name": "incentivesAprBps",
+                        "type": "int256"
+                    },
+                    {
+                        "internalType": "int256",
+                        "name": "feeBps",
+                        "type": "int256"
+                    },
+                    {
+                        "internalType": "uint8",
+                        "name": "riskScore",
+                        "type": "uint8"
+                    },
+                    {
+                        "internalType": "uint64",
+                        "name": "openedAt",
+                        "type": "uint64"
+                    },
+                    {
+                        "internalType": "uint64",
+                        "name": "lastRebalancedAt",
+                        "type": "uint64"
+                    },
+                    {
+                        "internalType": "uint64",
+                        "name": "nextHarvestAt",
+                        "type": "uint64"
+                    },
+                    {
+                        "internalType": "uint256",
+                        "name": "accruedYieldUsd",
+                        "type": "uint256"
+                    }
+                ],
+                "internalType": "struct OpenCrateNFT.PositionDetails[]",
+                "name": "",
+                "type": "tuple[]"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "address",
+                "name": "token",
+                "type": "address"
+            }
+        ],
+        "name": "getSupportedToken",
+        "outputs": [
+            {
+                "components": [
+                    {
+                        "internalType": "bool",
+                        "name": "enabled",
+                        "type": "bool"
+                    },
+                    {
+                        "internalType": "uint256",
+                        "name": "priceUsd",
+                        "type": "uint256"
+                    },
+                    {
+                        "internalType": "uint8",
+                        "name": "decimals",
+                        "type": "uint8"
+                    }
+                ],
+                "internalType": "struct OpenCrateNFT.TokenInfo",
+                "name": "",
+                "type": "tuple"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "getWhitelistedTokens",
+        "outputs": [
+            {
+                "internalType": "address[]",
+                "name": "",
+                "type": "address[]"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "address",
+                "name": "owner",
+                "type": "address"
+            },
+            {
+                "internalType": "address",
+                "name": "operator",
+                "type": "address"
+            }
+        ],
+        "name": "isApprovedForAll",
+        "outputs": [
+            {
+                "internalType": "bool",
+                "name": "",
+                "type": "bool"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "components": [
+                    {
+                        "internalType": "address",
+                        "name": "to",
+                        "type": "address"
+                    },
+                    {
+                        "internalType": "uint8",
+                        "name": "riskLevel",
+                        "type": "uint8"
+                    },
+                    {
+                        "internalType": "uint256",
+                        "name": "strategyId",
+                        "type": "uint256"
+                    },
+                    {
+                        "internalType": "address",
+                        "name": "account",
+                        "type": "address"
+                    },
+                    {
+                        "internalType": "uint256",
+                        "name": "priceUsd",
+                        "type": "uint256"
+                    },
+                    {
+                        "internalType": "uint16",
+                        "name": "boostMultiplierBps",
+                        "type": "uint16"
+                    },
+                    {
+                        "internalType": "uint64",
+                        "name": "lockDuration",
+                        "type": "uint64"
+                    },
+                    {
+                        "internalType": "address",
+                        "name": "creator",
+                        "type": "address"
+                    },
+                    {
+                        "internalType": "uint16",
+                        "name": "revenueShareBps",
+                        "type": "uint16"
+                    },
+                    {
+                        "internalType": "uint16",
+                        "name": "platformFeeBps",
+                        "type": "uint16"
+                    },
+                    {
+                        "internalType": "uint16",
+                        "name": "performanceFeeBps",
+                        "type": "uint16"
+                    },
+                    {
+                        "internalType": "string",
+                        "name": "riskDisclosure",
+                        "type": "string"
+                    },
+                    {
+                        "internalType": "string",
+                        "name": "feeDisclosure",
+                        "type": "string"
+                    },
+                    {
+                        "internalType": "uint64",
+                        "name": "lastRebalanceAt",
+                        "type": "uint64"
+                    },
+                    {
+                        "internalType": "uint64",
+                        "name": "nextHarvestAt",
+                        "type": "uint64"
+                    },
+                    {
+                        "internalType": "uint256",
+                        "name": "accruedYieldUsd",
+                        "type": "uint256"
+                    },
+                    {
+                        "internalType": "bool",
+                        "name": "boostActive",
+                        "type": "bool"
+                    },
+                    {
+                        "components": [
+                            {
+                                "internalType": "string",
+                                "name": "protocol",
+                                "type": "string"
+                            },
+                            {
+                                "internalType": "string",
+                                "name": "asset",
+                                "type": "string"
+                            },
+                            {
+                                "internalType": "string",
+                                "name": "strategyType",
+                                "type": "string"
+                            },
+                            {
+                                "internalType": "string",
+                                "name": "chain",
+                                "type": "string"
+                            },
+                            {
+                                "internalType": "string",
+                                "name": "infoURL",
+                                "type": "string"
+                            },
+                            {
+                                "internalType": "uint16",
+                                "name": "allocationBps",
+                                "type": "uint16"
+                            },
+                            {
+                                "internalType": "uint256",
+                                "name": "allocationUsd",
+                                "type": "uint256"
+                            },
+                            {
+                                "internalType": "int256",
+                                "name": "netApyBps",
+                                "type": "int256"
+                            },
+                            {
+                                "internalType": "int256",
+                                "name": "baseAprBps",
+                                "type": "int256"
+                            },
+                            {
+                                "internalType": "int256",
+                                "name": "incentivesAprBps",
+                                "type": "int256"
+                            },
+                            {
+                                "internalType": "int256",
+                                "name": "feeBps",
+                                "type": "int256"
+                            },
+                            {
+                                "internalType": "uint8",
+                                "name": "riskScore",
+                                "type": "uint8"
+                            },
+                            {
+                                "internalType": "uint64",
+                                "name": "openedAt",
+                                "type": "uint64"
+                            },
+                            {
+                                "internalType": "uint64",
+                                "name": "lastRebalancedAt",
+                                "type": "uint64"
+                            },
+                            {
+                                "internalType": "uint64",
+                                "name": "nextHarvestAt",
+                                "type": "uint64"
+                            },
+                            {
+                                "internalType": "uint256",
+                                "name": "accruedYieldUsd",
+                                "type": "uint256"
+                            }
+                        ],
+                        "internalType": "struct OpenCrateNFT.PositionPayload[]",
+                        "name": "positions",
+                        "type": "tuple[]"
+                    }
+                ],
+                "internalType": "struct OpenCrateNFT.MintParams",
+                "name": "params",
+                "type": "tuple"
+            }
+        ],
+        "name": "mintCrate",
+        "outputs": [
+            {
+                "internalType": "uint256",
+                "name": "tokenId",
+                "type": "uint256"
+            }
+        ],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "name",
+        "outputs": [
+            {
+                "internalType": "string",
+                "name": "",
+                "type": "string"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "nextTokenId",
+        "outputs": [
+            {
+                "internalType": "uint256",
+                "name": "",
+                "type": "uint256"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "owner",
+        "outputs": [
+            {
+                "internalType": "address",
+                "name": "",
+                "type": "address"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "uint256",
+                "name": "tokenId",
+                "type": "uint256"
+            }
+        ],
+        "name": "ownerOf",
+        "outputs": [
+            {
+                "internalType": "address",
+                "name": "",
+                "type": "address"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "pause",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "paused",
+        "outputs": [
+            {
+                "internalType": "bool",
+                "name": "",
+                "type": "bool"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "uint256",
+                "name": "tokenId",
+                "type": "uint256"
+            }
+        ],
+        "name": "positionsCount",
+        "outputs": [
+            {
+                "internalType": "uint256",
+                "name": "",
+                "type": "uint256"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "address",
+                "name": "token",
+                "type": "address"
+            }
+        ],
+        "name": "removeSupportedToken",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "renounceOwnership",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "uint256",
+                "name": "tokenId",
+                "type": "uint256"
+            },
+            {
+                "internalType": "uint256",
+                "name": "salePrice",
+                "type": "uint256"
+            }
+        ],
+        "name": "royaltyInfo",
+        "outputs": [
+            {
+                "internalType": "address",
+                "name": "receiver",
+                "type": "address"
+            },
+            {
+                "internalType": "uint256",
+                "name": "amount",
+                "type": "uint256"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "address",
+                "name": "from",
+                "type": "address"
+            },
+            {
+                "internalType": "address",
+                "name": "to",
+                "type": "address"
+            },
+            {
+                "internalType": "uint256",
+                "name": "tokenId",
+                "type": "uint256"
+            }
+        ],
+        "name": "safeTransferFrom",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "address",
+                "name": "from",
+                "type": "address"
+            },
+            {
+                "internalType": "address",
+                "name": "to",
+                "type": "address"
+            },
+            {
+                "internalType": "uint256",
+                "name": "tokenId",
+                "type": "uint256"
+            },
+            {
+                "internalType": "bytes",
+                "name": "data",
+                "type": "bytes"
+            }
+        ],
+        "name": "safeTransferFrom",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "address",
+                "name": "operator",
+                "type": "address"
+            },
+            {
+                "internalType": "bool",
+                "name": "approved",
+                "type": "bool"
+            }
+        ],
+        "name": "setApprovalForAll",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "string",
+                "name": "baseURI_",
+                "type": "string"
+            }
+        ],
+        "name": "setBaseURI",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "uint256",
+                "name": "tokenId",
+                "type": "uint256"
+            },
+            {
+                "internalType": "uint16",
+                "name": "newBoostMultiplierBps",
+                "type": "uint16"
+            }
+        ],
+        "name": "setBoostMultiplier",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "uint256",
+                "name": "tokenId",
+                "type": "uint256"
+            },
+            {
+                "internalType": "bool",
+                "name": "active",
+                "type": "bool"
+            },
+            {
+                "internalType": "uint16",
+                "name": "newBoostMultiplierBps",
+                "type": "uint16"
+            }
+        ],
+        "name": "setBoostStatus",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "address",
+                "name": "receiver",
+                "type": "address"
+            },
+            {
+                "internalType": "uint96",
+                "name": "feeNumerator",
+                "type": "uint96"
+            }
+        ],
+        "name": "setDefaultRoyalty",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "address",
+                "name": "newFactory",
+                "type": "address"
+            }
+        ],
+        "name": "setFactory",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "uint256",
+                "name": "tokenId",
+                "type": "uint256"
+            },
+            {
+                "internalType": "address",
+                "name": "receiver",
+                "type": "address"
+            },
+            {
+                "internalType": "uint96",
+                "name": "feeNumerator",
+                "type": "uint96"
+            }
+        ],
+        "name": "setTokenRoyalty",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "address",
+                "name": "",
+                "type": "address"
+            }
+        ],
+        "name": "supportedTokens",
+        "outputs": [
+            {
+                "internalType": "bool",
+                "name": "enabled",
+                "type": "bool"
+            },
+            {
+                "internalType": "uint256",
+                "name": "priceUsd",
+                "type": "uint256"
+            },
+            {
+                "internalType": "uint8",
+                "name": "decimals",
+                "type": "uint8"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "bytes4",
+                "name": "interfaceId",
+                "type": "bytes4"
+            }
+        ],
+        "name": "supportsInterface",
+        "outputs": [
+            {
+                "internalType": "bool",
+                "name": "",
+                "type": "bool"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "symbol",
+        "outputs": [
+            {
+                "internalType": "string",
+                "name": "",
+                "type": "string"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "toggleEmergencyMode",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "uint256",
+                "name": "tokenId",
+                "type": "uint256"
+            }
+        ],
+        "name": "tokenURI",
+        "outputs": [
+            {
+                "internalType": "string",
+                "name": "",
+                "type": "string"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "totalMinted",
+        "outputs": [
+            {
+                "internalType": "uint256",
+                "name": "",
+                "type": "uint256"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "address",
+                "name": "from",
+                "type": "address"
+            },
+            {
+                "internalType": "address",
+                "name": "to",
+                "type": "address"
+            },
+            {
+                "internalType": "uint256",
+                "name": "tokenId",
+                "type": "uint256"
+            }
+        ],
+        "name": "transferFrom",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "address",
+                "name": "newOwner",
+                "type": "address"
+            }
+        ],
+        "name": "transferOwnership",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "unpause",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "uint256",
+                "name": "tokenId",
+                "type": "uint256"
+            },
+            {
+                "internalType": "string",
+                "name": "riskDisclosure",
+                "type": "string"
+            },
+            {
+                "internalType": "string",
+                "name": "feeDisclosure",
+                "type": "string"
+            }
+        ],
+        "name": "updateDisclosures",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "uint256",
+                "name": "tokenId",
+                "type": "uint256"
+            },
+            {
+                "internalType": "uint64",
+                "name": "lastRebalanceAt",
+                "type": "uint64"
+            },
+            {
+                "internalType": "uint64",
+                "name": "nextHarvestAt",
+                "type": "uint64"
+            },
+            {
+                "internalType": "uint256",
+                "name": "accruedYieldUsd",
+                "type": "uint256"
+            }
+        ],
+        "name": "updateLifecycle",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "uint256",
+                "name": "tokenId",
+                "type": "uint256"
+            },
+            {
+                "components": [
+                    {
+                        "internalType": "string",
+                        "name": "protocol",
+                        "type": "string"
+                    },
+                    {
+                        "internalType": "string",
+                        "name": "asset",
+                        "type": "string"
+                    },
+                    {
+                        "internalType": "string",
+                        "name": "strategyType",
+                        "type": "string"
+                    },
+                    {
+                        "internalType": "string",
+                        "name": "chain",
+                        "type": "string"
+                    },
+                    {
+                        "internalType": "string",
+                        "name": "infoURL",
+                        "type": "string"
+                    },
+                    {
+                        "internalType": "uint16",
+                        "name": "allocationBps",
+                        "type": "uint16"
+                    },
+                    {
+                        "internalType": "uint256",
+                        "name": "allocationUsd",
+                        "type": "uint256"
+                    },
+                    {
+                        "internalType": "int256",
+                        "name": "netApyBps",
+                        "type": "int256"
+                    },
+                    {
+                        "internalType": "int256",
+                        "name": "baseAprBps",
+                        "type": "int256"
+                    },
+                    {
+                        "internalType": "int256",
+                        "name": "incentivesAprBps",
+                        "type": "int256"
+                    },
+                    {
+                        "internalType": "int256",
+                        "name": "feeBps",
+                        "type": "int256"
+                    },
+                    {
+                        "internalType": "uint8",
+                        "name": "riskScore",
+                        "type": "uint8"
+                    },
+                    {
+                        "internalType": "uint64",
+                        "name": "openedAt",
+                        "type": "uint64"
+                    },
+                    {
+                        "internalType": "uint64",
+                        "name": "lastRebalancedAt",
+                        "type": "uint64"
+                    },
+                    {
+                        "internalType": "uint64",
+                        "name": "nextHarvestAt",
+                        "type": "uint64"
+                    },
+                    {
+                        "internalType": "uint256",
+                        "name": "accruedYieldUsd",
+                        "type": "uint256"
+                    }
+                ],
+                "internalType": "struct OpenCrateNFT.PositionPayload[]",
+                "name": "positions",
+                "type": "tuple[]"
+            }
+        ],
+        "name": "updatePositions",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "uint256",
+                "name": "tokenId",
+                "type": "uint256"
+            },
+            {
+                "internalType": "uint256",
+                "name": "newPriceUsd",
+                "type": "uint256"
+            }
+        ],
+        "name": "updatePrice",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "uint256",
+                "name": "tokenId",
+                "type": "uint256"
+            },
+            {
+                "internalType": "uint16",
+                "name": "revenueShareBps",
+                "type": "uint16"
+            },
+            {
+                "internalType": "uint16",
+                "name": "platformFeeBps",
+                "type": "uint16"
+            },
+            {
+                "internalType": "uint16",
+                "name": "performanceFeeBps",
+                "type": "uint16"
+            }
+        ],
+        "name": "updateRevenueShare",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "address",
+                "name": "token",
+                "type": "address"
+            },
+            {
+                "internalType": "uint256",
+                "name": "newPriceUsd",
+                "type": "uint256"
+            }
+        ],
+        "name": "updateTokenPrice",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "uint256",
+                "name": "",
+                "type": "uint256"
+            }
+        ],
+        "name": "whitelistedTokens",
+        "outputs": [
+            {
+                "internalType": "address",
+                "name": "",
+                "type": "address"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    }
+]

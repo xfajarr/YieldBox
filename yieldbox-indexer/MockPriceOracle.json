@@ -2,13 +2,8 @@
     {
         "inputs": [
             {
-                "internalType": "contract MockYieldProtocol",
-                "name": "protocol_",
-                "type": "address"
-            },
-            {
                 "internalType": "address",
-                "name": "owner_",
+                "name": "initialOwner",
                 "type": "address"
             }
         ],
@@ -17,38 +12,7 @@
     },
     {
         "inputs": [],
-        "name": "AdapterInvalidData",
-        "type": "error"
-    },
-    {
-        "inputs": [],
-        "name": "AdapterNotRegistered",
-        "type": "error"
-    },
-    {
-        "inputs": [
-            {
-                "internalType": "address",
-                "name": "caller",
-                "type": "address"
-            },
-            {
-                "internalType": "address",
-                "name": "account",
-                "type": "address"
-            }
-        ],
-        "name": "AdapterUnauthorized",
-        "type": "error"
-    },
-    {
-        "inputs": [],
-        "name": "AdapterZeroAmount",
-        "type": "error"
-    },
-    {
-        "inputs": [],
-        "name": "InvalidProtocolAddress",
+        "name": "InvalidPrice",
         "type": "error"
     },
     {
@@ -74,35 +38,20 @@
         "type": "error"
     },
     {
-        "anonymous": false,
         "inputs": [
             {
-                "indexed": true,
                 "internalType": "address",
-                "name": "account",
+                "name": "token",
                 "type": "address"
-            },
-            {
-                "indexed": true,
-                "internalType": "address",
-                "name": "receiver",
-                "type": "address"
-            },
-            {
-                "indexed": false,
-                "internalType": "uint256",
-                "name": "amount",
-                "type": "uint256"
-            },
-            {
-                "indexed": false,
-                "internalType": "bytes",
-                "name": "data",
-                "type": "bytes"
             }
         ],
-        "name": "Deposited",
-        "type": "event"
+        "name": "TokenNotSupported",
+        "type": "error"
+    },
+    {
+        "inputs": [],
+        "name": "ZeroAddress",
+        "type": "error"
     },
     {
         "anonymous": false,
@@ -129,29 +78,23 @@
             {
                 "indexed": true,
                 "internalType": "address",
-                "name": "account",
-                "type": "address"
-            },
-            {
-                "indexed": true,
-                "internalType": "address",
-                "name": "receiver",
+                "name": "token",
                 "type": "address"
             },
             {
                 "indexed": false,
                 "internalType": "uint256",
-                "name": "amount",
+                "name": "priceUsd",
                 "type": "uint256"
             },
             {
                 "indexed": false,
-                "internalType": "bytes",
-                "name": "data",
-                "type": "bytes"
+                "internalType": "uint256",
+                "name": "timestamp",
+                "type": "uint256"
             }
         ],
-        "name": "Withdrawn",
+        "name": "PriceUpdated",
         "type": "event"
     },
     {
@@ -160,45 +103,35 @@
             {
                 "indexed": true,
                 "internalType": "address",
-                "name": "account",
-                "type": "address"
-            },
-            {
-                "indexed": true,
-                "internalType": "address",
-                "name": "receiver",
+                "name": "token",
                 "type": "address"
             },
             {
                 "indexed": false,
                 "internalType": "uint256",
-                "name": "amount",
+                "name": "priceUsd",
                 "type": "uint256"
-            },
-            {
-                "indexed": false,
-                "internalType": "bytes",
-                "name": "data",
-                "type": "bytes"
             }
         ],
-        "name": "YieldClaimed",
+        "name": "TokenAdded",
         "type": "event"
     },
     {
+        "anonymous": false,
         "inputs": [
             {
+                "indexed": true,
                 "internalType": "address",
-                "name": "account",
+                "name": "token",
                 "type": "address"
-            },
-            {
-                "internalType": "bytes",
-                "name": "data",
-                "type": "bytes"
             }
         ],
-        "name": "claim",
+        "name": "TokenRemoved",
+        "type": "event"
+    },
+    {
+        "inputs": [],
+        "name": "DECIMALS",
         "outputs": [
             {
                 "internalType": "uint256",
@@ -206,18 +139,12 @@
                 "type": "uint256"
             }
         ],
-        "stateMutability": "nonpayable",
+        "stateMutability": "view",
         "type": "function"
     },
     {
-        "inputs": [
-            {
-                "internalType": "address",
-                "name": "account",
-                "type": "address"
-            }
-        ],
-        "name": "currentValue",
+        "inputs": [],
+        "name": "IDR_PER_USD",
         "outputs": [
             {
                 "internalType": "uint256",
@@ -231,30 +158,139 @@
     {
         "inputs": [
             {
-                "internalType": "address",
-                "name": "account",
-                "type": "address"
-            },
-            {
                 "internalType": "uint256",
-                "name": "amount",
+                "name": "amountIdr",
                 "type": "uint256"
-            },
-            {
-                "internalType": "bytes",
-                "name": "data",
-                "type": "bytes"
             }
         ],
-        "name": "deposit",
+        "name": "convertIdrToUsd",
         "outputs": [
             {
                 "internalType": "uint256",
-                "name": "",
+                "name": "amountUsd",
                 "type": "uint256"
             }
         ],
-        "stateMutability": "nonpayable",
+        "stateMutability": "pure",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "uint256",
+                "name": "amountUsd",
+                "type": "uint256"
+            }
+        ],
+        "name": "convertUsdToIdr",
+        "outputs": [
+            {
+                "internalType": "uint256",
+                "name": "amountIdr",
+                "type": "uint256"
+            }
+        ],
+        "stateMutability": "pure",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "getSupportedTokens",
+        "outputs": [
+            {
+                "internalType": "address[]",
+                "name": "tokens",
+                "type": "address[]"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "address",
+                "name": "token",
+                "type": "address"
+            }
+        ],
+        "name": "getTokenInfo",
+        "outputs": [
+            {
+                "components": [
+                    {
+                        "internalType": "uint256",
+                        "name": "priceUsd",
+                        "type": "uint256"
+                    },
+                    {
+                        "internalType": "uint256",
+                        "name": "lastUpdated",
+                        "type": "uint256"
+                    },
+                    {
+                        "internalType": "bool",
+                        "name": "active",
+                        "type": "bool"
+                    }
+                ],
+                "internalType": "struct MockPriceOracle.TokenPrice",
+                "name": "price",
+                "type": "tuple"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "address",
+                "name": "token",
+                "type": "address"
+            }
+        ],
+        "name": "getTokenPriceIdr",
+        "outputs": [
+            {
+                "internalType": "uint256",
+                "name": "priceIdr",
+                "type": "uint256"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "address",
+                "name": "token",
+                "type": "address"
+            }
+        ],
+        "name": "getTokenPriceUsd",
+        "outputs": [
+            {
+                "internalType": "uint256",
+                "name": "priceUsd",
+                "type": "uint256"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "getUsdIdrRate",
+        "outputs": [
+            {
+                "internalType": "uint256",
+                "name": "rate",
+                "type": "uint256"
+            }
+        ],
+        "stateMutability": "pure",
         "type": "function"
     },
     {
@@ -274,49 +310,54 @@
         "inputs": [
             {
                 "internalType": "address",
-                "name": "account",
+                "name": "token",
                 "type": "address"
             }
         ],
-        "name": "position",
-        "outputs": [
-            {
-                "components": [
-                    {
-                        "internalType": "uint256",
-                        "name": "principal",
-                        "type": "uint256"
-                    },
-                    {
-                        "internalType": "uint256",
-                        "name": "pendingYield",
-                        "type": "uint256"
-                    }
-                ],
-                "internalType": "struct IDeFiAdapter.Position",
-                "name": "info",
-                "type": "tuple"
-            }
-        ],
-        "stateMutability": "view",
-        "type": "function"
-    },
-    {
-        "inputs": [],
-        "name": "protocol",
-        "outputs": [
-            {
-                "internalType": "contract MockYieldProtocol",
-                "name": "",
-                "type": "address"
-            }
-        ],
-        "stateMutability": "view",
+        "name": "removeToken",
+        "outputs": [],
+        "stateMutability": "nonpayable",
         "type": "function"
     },
     {
         "inputs": [],
         "name": "renounceOwnership",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "address",
+                "name": "token",
+                "type": "address"
+            },
+            {
+                "internalType": "uint256",
+                "name": "priceUsd",
+                "type": "uint256"
+            }
+        ],
+        "name": "setTokenPrice",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "address[]",
+                "name": "tokens",
+                "type": "address[]"
+            },
+            {
+                "internalType": "uint256[]",
+                "name": "pricesUsd",
+                "type": "uint256[]"
+            }
+        ],
+        "name": "setTokenPricesBatch",
         "outputs": [],
         "stateMutability": "nonpayable",
         "type": "function"
@@ -331,35 +372,6 @@
         ],
         "name": "transferOwnership",
         "outputs": [],
-        "stateMutability": "nonpayable",
-        "type": "function"
-    },
-    {
-        "inputs": [
-            {
-                "internalType": "address",
-                "name": "account",
-                "type": "address"
-            },
-            {
-                "internalType": "uint256",
-                "name": "amount",
-                "type": "uint256"
-            },
-            {
-                "internalType": "bytes",
-                "name": "data",
-                "type": "bytes"
-            }
-        ],
-        "name": "withdraw",
-        "outputs": [
-            {
-                "internalType": "uint256",
-                "name": "",
-                "type": "uint256"
-            }
-        ],
         "stateMutability": "nonpayable",
         "type": "function"
     }
