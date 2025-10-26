@@ -62,6 +62,14 @@ const fqMap: Record<string, string> = {
   OpenCrateFactory: "contracts/OpenCrateFactory.sol:OpenCrateFactory",
 };
 
+function wasBlockscoutSuccess(text: string): boolean {
+  const t = text.toLowerCase();
+  return (
+    t.includes("contract verified successfully on blockscout") ||
+    t.includes("has already been verified on blockscout")
+  );
+}
+
 async function main() {
   console.log("🔍 Verifying contracts on Base Sepolia...");
 
@@ -198,12 +206,20 @@ async function main() {
         console.log(`✅ ${name} verified successfully`);
         break;
       } catch (error: any) {
+        // Collect any string we can get from the error to inspect explorer output
         const combined =
-          (error?.message || "") +
-          (error?.stdout || "") +
-          (error?.stderr || "");
+          (error?.message ? String(error.message) : "") +
+          (error?.stdout ? String(error.stdout) : "") +
+          (error?.stderr ? String(error.stderr) : "");
 
-        if (combined.includes("Already Verified")) {
+        // Treat Blockscout success as success even if Etherscan part failed
+        if (wasBlockscoutSuccess(combined)) {
+          console.log(`✅ ${name} verified on Blockscout`);
+          break;
+        }
+
+        // Handle "Already Verified"
+        if (combined.toLowerCase().includes("already verified")) {
           console.log(`✅ ${name} already verified`);
           break;
         }
